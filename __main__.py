@@ -50,19 +50,19 @@ def getKey(): # Get key from terminal input
   
 
 ### String Based Math Functions ###
-# All assume the format: "#.###..." (positive and 1 digit followed by a variable amount of fractional digits, in base 10). Unless otherwise stated
 
-def strAdd(str1, str2):
+def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
+  # Format: "...###" (Any positive integer)
   
   # Make equal length
   
   while len(str1) < len(str2):
-    str1 = str1 + '0'
+    str1 = '0' + str1
   
   while len(str1) > len(str2):
-    str2 = str2 + '0'
+    str2 = '0' + str2
   
-  DBStr = 'strAdd: \n' + str1 + ' +\n' + str2 + ' =\n'
+  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n  '
   # Debug string
   
   # Compute
@@ -76,15 +76,19 @@ def strAdd(str1, str2):
       continue
       # Skip if either not numeric
     
-    num = int(str1[-i]) + int(str2[-i]) + carry
-    # Calculation for this digit
+    sumDig = int(str1[-i]) + int(str2[-i]) + carry
+    # Add current digits
     
-    out = str(num % 10) + out
+    out = str(sumDig % 10) + out
     # Add digit to out
     
-    carry = num // 10
+    carry = sumDig // 10
     # Carry over
     
+  
+  # Final Carry
+  
+  out = str(carry) + out
   
   # Debug
   
