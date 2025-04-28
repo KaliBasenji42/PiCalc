@@ -62,7 +62,7 @@ def strAdd(str1, str2):
   while len(str1) > len(str2):
     str2 = str2 + '0'
   
-  DBStr = 'strAdd: \n' + str1 + ' +\n' + str2
+  DBStr = 'strAdd: \n' + str1 + ' +\n' + str2 + ' =\n'
   # Debug string
   
   # Compute
@@ -85,6 +85,13 @@ def strAdd(str1, str2):
     carry = num // 10
     # Carry over
     
+  
+  # Debug
+  
+  DBStr = DBStr + out
+  logging.debug(DBStr)
+  
+  # Return
   
   return out
   
