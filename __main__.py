@@ -62,8 +62,9 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   while len(str1) > len(str2):
     str2 = '0' + str2
   
-  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n  '
+  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n C'
   # Debug string
+  DBStrC = '' # Debug string for carry
   
   # Compute
   
@@ -73,6 +74,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   for i in range(len(str1)):
     
     if not str1[-i].isnumeric() or not str1[-i].isnumeric():
+      DBStrC = 'X' + DBStrC # Debug
       continue
       # Skip if either not numeric
     
@@ -82,8 +84,9 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
     out = str((sumDig % 10)) + out
     # Add digit to out
     
-    carry = sumDig // 10
-    # Carry over
+    carry = sumDig // 10 # Carry over
+    
+    DBStrC = str(carry) + DBStrC # Debug
     
   
   # Final Carry
@@ -92,7 +95,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   # Debug
   
-  DBStr = DBStr + out
+  DBStr = DBStr + DBStrC + '\n  ' + out
   logging.debug(DBStr)
   
   # Return
