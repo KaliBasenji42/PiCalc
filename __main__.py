@@ -1,197 +1,110 @@
+### Import ###
+
+import sys
 import time
+import termios
+import tty
+import logging
 
-# Variables
+logging.basicConfig(
+    level=logging.ERROR,
+    format='%(asctime)s | %(levelname)s: %(message)s',
+    filename='app.log'
+)
+logging.debug('New Run: ')
 
-inp = 0
+### Variables ###
 
-# Functions
+run = True # Run Main Loop
+pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and sould not be returned
 
-def strToInt(string):
-    
-    intStr = '0'
-    
-    string = string + ' '
-    
-    for char in string:
-        
-        if char.isnumeric(): intStr = intStr + char
-        
-    
-    num = int(intStr)
-    
-    if string[0] == '-': num = num * -1
-    
-    return num
-    
+piStr = '' # Apprx of pi, stored as string
 
-def strShift(string, shift):
-    
-    out = ''
-    
-    for i in range(len(string)):
-        
-        if 0 <= i + shift < len(string): out += string[i + shift]
-        
-        else: out += '0'
-        
-    
-    return out
-    
+### (Basic) Functions ###
 
-def numToStr(num, digits):
+def getKey(): # Get key from terminal input
+  
+  global pastKeys
+  
+  fd = sys.stdin.fileno()
+  old = termios.tcgetattr(fd) # Old terminal settings
+  
+  try:
+    tty.setraw(sys.stdin.fileno()) # Terminal to raw (non-conical & no echo)
     
-    num = str(num)
+    chr = sys.stdin.read(1) # Get char entered
     
-    out = ''
+    pastKeys = roll(pastKeys, chr) # Roll chr into pastKeys
     
-    for char in num:
-        
-        if char.isnumeric(): out += char
-        
+    shouldReturn = False # Should it return chr?
+    if pastKeys[-2] != '[': shouldReturn = True
+    elif pastKeys[-3] != '\x1b': shouldReturn = True
     
-    if len(out) >= digits: out = out[:digits]
+    logging.debug('Key Press: ' + chr + ' (shouldReturn: ' + str(shouldReturn) + ', ' + str(pastKeys) + ')') # Logging
     
-    for i in range(digits - len(out)): out += '0'
+    if shouldReturn: return chr # Return
+    return '' # Base case
     
-    return out
-    
+  finally:
+    termios.tcsetattr(fd, termios.TCSADRAIN, old) # Restore terminal settings
+  
 
-def longDivision(dividend, divisor):
-    
-    return (numToStr(dividend / divisor), 0)
-    
+### String Based Math Functions ###
+# All assume the format: "#.###..." (positive and 1 digit followed by a variable amount of fractional digits, in base 10). Unless otherwise stated
 
-def addStr(str1, str2, shift):
+def strAdd(str1, str2):
+  
+  # Make equal length
+  
+  while len(str1) < len(str2):
+    str1 = str1 + '0'
+  
+  while len(str1) > len(str2):
+    str2 = str2 + '0'
+  
+  DBStr = 'strAdd: \n' + str1 + ' +\n' + str2
+  # Debug string
+  
+  # Compute
+  
+  out = ''
+  carry = 0
+  
+  for i in range(len(str1)):
     
-    out = ''
+    if not str1[-i].isnumeric() or not str1[-i].isnumeric():
+      continue
+      # Skip if either not numeric
     
-    str1 = shiftStr(str1, shift)
+    num = int(str1[-i]) + int(str2[-i]) + carry
+    # Calculation for this digit
     
-    for i in range(len(str1)):
-        
-        if i + shift < len(str2):
-            
-            out += str(int(str1[i]) + int(str2[i + shift]))
-            
-        
-        else: out += str1[i]
-        
+    out = str(num % 10) + out
+    # Add digit to out
     
-    return out
+    carry = num // 10
+    # Carry over
     
+  
+  return out
+  
 
-def printCorrectDigits(string, shift, prev, prevShift, dot):
-    
-    out = 0
-    
-    dif = shift - prevShift
-    
-    if dif < 0: 
-        
-        print('Err!')
-        
-        return 0
-        
-    
-    else:
-        
-        prev = prev[dif:]
-        
-    
-    for i in range(min(len(prev),len(prev))):
-        
-        if prev[i] == string[i]:
-            
-            out += 1
-            
-            print(prev[i], end = '')
-            
-            if i + shift == dot: print('.', end = '')
-            
-        
-    
-    return out
-    
+print(strAdd('1', '1'))
 
-def BBPStep(aprx, digtit, k):
-    
-    val = 4 / (8*k + 1)
-    val -= 2 / (8*k + 4)
-    val -= 1 / (8*k + 5)
-    val -= 1 / (8*k + 6)
-    val = val / (16 ** k)
-    
-    aprx += val * (10 ** digits)
-    
-    return aprx
-    
+### Step Functions ###
 
-def GLSStep(aprx, digits, k):
-    
-    val = -((2 * k) + 1) * ((k % 2) * 2 - 1)
-    
-    aprx += 4 / val * (10 ** digits)
-    
-    return aprx
-    
+### Pre-Loop ###
 
-def NilakanthaStep(aprx, digits, k):
-    
-    div = -((k*2) * ((k*2) + 1) * ((k*2) + 2)) * ((k % 2) * 2 - 1)
-    
-    if k == 0: div = 3 / 4
-    
-    aprx += 4 / div * (10 ** digits)
-    
-    return aprx
-    
+### Main Loop ###
 
-def step(aprx, shift, k):
+try:
+  
+  while run:
     
-    div = -((k*2) * ((k*2) + 1) * ((k*2) + 2)) * ((k % 2) * 2 - 1)
+    pass
     
-    if k == 0: div = 3 / 4
-    
-    aprx 
-    
-    
+  
 
-def piDigit(n):
-    
-    k = 0
-    
-    digits = ''
-    
-    shift = 0 # Currect Number if Digits
-    
-    while k < n:
-        
-        prev = digits
-        
-        prevShift = shift
-        
-        # Calc
-        
-        digits = step(digits, shift , k)
-        
-        # Currect Digit Calc
-        
-        shift += printCorrectDigits(digits, shift, prev, prevShift, 1)
-        
-        # Loop
-        
-        k += 1
-        
-        
-    if digits == '': print('"n" to small :/')
-    else: print('')
-    
-
-# Main Loop
-
-while True:
-    
-    inp = strToInt(input('\nInput: '))
-    
-    piDigit(inp)
-    
+except Exception as e:
+  logging.exception(e)
+  print('\033[97;41mFatal Error\033[0m')
