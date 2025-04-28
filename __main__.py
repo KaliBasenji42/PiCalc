@@ -79,7 +79,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
     sumDig = int(str1[-i]) + int(str2[-i]) + carry
     # Add current digits
     
-    out = str(sumDig % 10) + out
+    out = strint((sumDig % 10)) + out
     # Add digit to out
     
     carry = sumDig // 10
@@ -88,7 +88,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   # Final Carry
   
-  out = str(carry) + out
+  if carry > 0: out = str(carry) + out
   
   # Debug
   
