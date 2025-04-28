@@ -73,7 +73,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   for i in range(len(str1)):
     
-    if not str1[-i].isnumeric() or not str1[-i].isnumeric():
+    if not str1[-i].isnumeric() or not str2[-i].isnumeric():
       DBStrC = 'X' + DBStrC # Debug
       continue
       # Skip if either not numeric
