@@ -2,8 +2,7 @@
 
 import sys
 import time
-import termios
-import tty
+import select
 import logging
 
 logging.basicConfig(
@@ -17,36 +16,19 @@ logging.debug('New Run: ')
 
 run = True # Run Main Loop
 pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and sould not be returned
+method = 0 # Method for calculating pi. 0: Nilakantha, 1: BBP
 
 piStr = '' # Apprx of pi, stored as string
 
 ### (Basic) Functions ###
 
-def getKey(): # Get key from terminal input
+def detectKey(): # Detects key press (used for exiting graph loop)
   
-  global pastKeys
+  if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+    key = sys.stdin.read(1)
+    return key
   
-  fd = sys.stdin.fileno()
-  old = termios.tcgetattr(fd) # Old terminal settings
-  
-  try:
-    tty.setraw(sys.stdin.fileno()) # Terminal to raw (non-conical & no echo)
-    
-    chr = sys.stdin.read(1) # Get char entered
-    
-    pastKeys = roll(pastKeys, chr) # Roll chr into pastKeys
-    
-    shouldReturn = False # Should it return chr?
-    if pastKeys[-2] != '[': shouldReturn = True
-    elif pastKeys[-3] != '\x1b': shouldReturn = True
-    
-    logging.debug('Key Press: ' + chr + ' (shouldReturn: ' + str(shouldReturn) + ', ' + str(pastKeys) + ')') # Logging
-    
-    if shouldReturn: return chr # Return
-    return '' # Base case
-    
-  finally:
-    termios.tcsetattr(fd, termios.TCSADRAIN, old) # Restore terminal settings
+  return None
   
 
 ### String Based Math Functions ###
@@ -74,19 +56,18 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   for i in range(len(str1)):
     
     if not str1[-i].isnumeric() or not str2[-i].isnumeric():
-      DBStrC = 'X' + DBStrC # Debug
-      continue
-      # Skip if either not numeric
+      raise Exception('None numeric value')
+      # Throw if either not numeric
     
     sumDig = int(str1[-i]) + int(str2[-i]) + carry
-    # Add current digits
+    # Add current digits & carry
     
-    out = str((sumDig % 10)) + out
+    out = str(sumDig)[-1] + out
     # Add digit to out
     
     carry = sumDig // 10 # Carry over
     
-    DBStrC = str(carry) + DBStrC # Debug
+    DBStrC = str(carry)[1] + DBStrC # Debug
     
   
   # Final Carry
@@ -115,7 +96,7 @@ try:
   
   while run:
     
-    pass
+    break
     
   
 
