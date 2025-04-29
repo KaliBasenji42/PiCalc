@@ -44,7 +44,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   while len(str1) > len(str2):
     str2 = '0' + str2
   
-  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n C'
+  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
   # Debug string
   DBStrC = '' # Debug string for carry
   
@@ -80,7 +80,8 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   # Debug
   
-  DBStr = DBStr + DBStrC + '\n  ' + out
+  if carry > 0: DBStr = DBStr + DBStrC + '\n ' + out
+  else: DBStr = DBStr + DBStrC + '\n  ' + out
   logging.debug(DBStr)
   
   # Return
@@ -88,7 +89,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   return out
   
 
-print(strAddInt('100', '1'))
+print(strAddInt('999', '1'))
 
 ### Step Functions ###
 
