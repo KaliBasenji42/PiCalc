@@ -59,6 +59,8 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
       raise Exception('None numeric value')
       # Throw if either not numeric
     
+    logging.debug(str1[-i] + ', ' + str2[-i] + ', ' + str(carry))
+    
     sumDig = int(str1[-i]) + int(str2[-i]) + carry
     # Add current digits & carry
     
@@ -67,7 +69,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
     
     carry = sumDig // 10 # Carry over
     
-    DBStrC = str(carry)[1] + DBStrC # Debug
+    DBStrC = str(carry)[0] + DBStrC # Debug
     
   
   # Final Carry
