@@ -86,7 +86,65 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   # Return
   
-  return out
+  return out, carry > 0
+  # Return output and if it carried
+  
+
+def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
+  # Format: "...###" (Any positive integer)
+  
+  # Make equal length
+  
+  while len(str1) < len(str2):
+    str1 = '0' + str1
+  
+  while len(str1) > len(str2):
+    str2 = '0' + str2
+  
+  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
+  # Debug string
+  DBStrC = '' # Debug string for carry
+  
+  # Compute
+  
+  out = ''
+  carry = 0
+  
+  for i in range(len(str1)):
+    
+    i = i + 1
+    
+    if not str1[-i].isnumeric() or not str2[-i].isnumeric():
+      raise Exception('None numeric value')
+      # Throw if either not numeric
+    
+    logging.debug(str1[-i] + ', ' + str2[-i] + ', ' + str(carry))
+    
+    sumDig = int(str1[-i]) + int(str2[-i]) + carry
+    # Add current digits & carry
+    
+    out = str(sumDig)[-1] + out
+    # Add digit to out
+    
+    carry = sumDig // 10 # Carry over
+    
+    DBStrC = str(carry)[0] + DBStrC # Debug
+    
+  
+  # Final Carry
+  
+  if carry > 0: out = str(carry) + out
+  
+  # Debug
+  
+  if carry > 0: DBStr = DBStr + DBStrC + '\n ' + out
+  else: DBStr = DBStr + DBStrC + '\n  ' + out
+  logging.debug(DBStr)
+  
+  # Return
+  
+  return out, carry > 0
+  # Return output and if it carried
   
 
 print(strAddInt('999', '1'))
