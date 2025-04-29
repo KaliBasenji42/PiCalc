@@ -55,6 +55,8 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   
   for i in range(len(str1)):
     
+    i = i + 1
+    
     if not str1[-i].isnumeric() or not str2[-i].isnumeric():
       raise Exception('None numeric value')
       # Throw if either not numeric
@@ -86,7 +88,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   return out
   
 
-print(strAddInt('1', '1'))
+print(strAddInt('100', '1'))
 
 ### Step Functions ###
 
