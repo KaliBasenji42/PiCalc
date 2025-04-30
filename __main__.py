@@ -66,7 +66,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
     sumDig = int(str1[-i]) + int(str2[-i]) + carry
     # Add current digits & carry
     
-    out = str(sumDig)[-1] + out
+    out = str(sumDig % 10) + out
     # Add digit to out
     
     carry = sumDig // 10 # Carry over
@@ -120,13 +120,13 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
     
     logging.debug(str1[-i] + ', ' + str2[-i] + ', ' + str(carry))
     
-    sumDig = int(str1[-i]) + int(str2[-i]) + carry
+    sumDig = int(str1[-i]) - int(str2[-i]) - carry
     # Add current digits & carry
     
-    out = str(sumDig)[-1] + out
+    out = str(sumDig % 10) + out
     # Add digit to out
     
-    carry = sumDig // 10 # Carry over
+    carry = (-sumDig + 10) // 10 # Carry over
     
     DBStrC = str(carry)[0] + DBStrC # Debug
     
@@ -147,7 +147,7 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return output and if it carried
   
 
-print(strAddInt('999', '1'))
+print(strSubInt('999', '1'))
 
 ### Step Functions ###
 
