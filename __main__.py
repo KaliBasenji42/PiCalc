@@ -98,7 +98,7 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return output and if it carried
   
 
-def strSubInt(str1, str2): # Subtracts 2 strings as if they where positive integers
+def strSubIntUnderFlow(str1, str2): # Subtracts 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
   # Note: str1 must > str2
   
@@ -167,12 +167,12 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
     # Calculate
     
-    fracResult = strAddInt(str1[1], str2[1])
-    intResult = strAddInt(str1[0][1:], str2[0][1:])
+    fracResult = strAddInt(str1[1], str2[1]) # Factional digits
+    intResult = strAddInt(str1[0][1:], str2[0][1:]) # Interger Digits
     
-    if fracResult[1]:
-      fracResult = (fracResult[1:], True)
-      intResult = strAddInt(intResult[0], '1')
+    if fracResult[1]: # If frac. digits overflow
+      fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
+      intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
     
     # Out
     
@@ -184,8 +184,24 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     pass
     
   
+  else: # Both positive
+    
+    # Calculate
+    
+    fracResult = strAddInt(str1[1], str2[1]) # Factional digits
+    intResult = strAddInt(str1[0], str2[0]) # Interger Digits
+    
+    if fracResult[1]: # If frac. digits overflow
+      fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
+      intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
+    
+    # Out
+    
+    return intResult[0] + '.' + fracResult[0]
+    
+  
 
-print(strSum('-.1', '-.9'))
+print(strSum('.1', '.9'))
 
 ### Step Functions ###
 
