@@ -170,7 +170,9 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     fracResult = strAddInt(str1[1], str2[1])
     intResult = strAddInt(str1[0][1:], str2[0][1:])
     
-    if fracResult[1]: intResult = strAddInt(intResult, '1')
+    if fracResult[1]:
+      fracResult = fracResult[1:]
+      intResult = strAddInt(intResult[0], '1')
     
     # Out
     
@@ -183,7 +185,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
   
 
-print(strSum('-1.', '-1.0'))
+print(strSum('-.1', '-.9'))
 
 ### Step Functions ###
 
