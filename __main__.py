@@ -131,14 +131,9 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
     DBStrC = str(carry)[0] + DBStrC # Debug
     
   
-  # Final Carry
-  
-  if carry > 0: out = str(carry) + out
-  
   # Debug
   
-  if carry > 0: DBStr = DBStr + DBStrC + '\n ' + out
-  else: DBStr = DBStr + DBStrC + '\n  ' + out
+  DBStr = DBStr + DBStrC + '\n  ' + out
   logging.debug(DBStr)
   
   # Return
@@ -147,7 +142,7 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return output and if it carried
   
 
-print(strSubInt('999', '1'))
+print(strSubInt('100', '1'))
 
 ### Step Functions ###
 
