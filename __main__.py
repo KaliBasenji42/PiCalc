@@ -31,6 +31,15 @@ def detectKey(): # Detects key press (used for exiting graph loop)
   return None
   
 
+def splitFracStr(string): # Splits a string by the first "."
+  
+  index = string.find('.')
+  
+  return string[:index-1], string[index:]
+  
+
+print(splitFracStr('1.0'))
+
 ### String Based Math Functions ###
 
 def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
@@ -58,10 +67,8 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
     i = i + 1
     
     if not str1[-i].isnumeric() or not str2[-i].isnumeric():
-      raise Exception('None numeric value')
+      raise Exception('Non-numeric value')
       # Throw if either not numeric
-    
-    logging.debug(str1[-i] + ', ' + str2[-i] + ', ' + str(carry))
     
     sumDig = int(str1[-i]) + int(str2[-i]) + carry
     # Add current digits & carry
@@ -90,8 +97,9 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return output and if it carried
   
 
-def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
+def strSubInt(str1, str2): # Subtracts 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
+  # Note: str1 must > str2
   
   # Make equal length
   
@@ -101,7 +109,7 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
   while len(str1) > len(str2):
     str2 = '0' + str2
   
-  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
+  DBStr = 'strAdd: \n  ' + str1 + ' -\n  ' + str2 + ' =\n '
   # Debug string
   DBStrC = '' # Debug string for carry
   
@@ -115,10 +123,8 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
     i = i + 1
     
     if not str1[-i].isnumeric() or not str2[-i].isnumeric():
-      raise Exception('None numeric value')
+      raise Exception('Non-numeric value')
       # Throw if either not numeric
-    
-    logging.debug(str1[-i] + ', ' + str2[-i] + ', ' + str(carry))
     
     sumDig = int(str1[-i]) - int(str2[-i]) - carry
     # Add current digits & carry
@@ -141,10 +147,25 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return
   
   return out, carry > 0
-  # Return output and if it carried
+  # Return output and if it underflowed
   
 
-print(strSubInt('100', '1'))
+def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if they where floats
+  # Format: "-###.###..." (Any float, may be negative)
+  
+  try: # Throw if non-numeric
+    float(str1)
+    float(str2)
+  except:
+    raise Exception('Non-numeric value')
+  
+  if str1[0] == '-' and str2[0] == '-': # Both negative
+    
+    
+    
+  
+
+print(strSum('1', '1'))
 
 ### Step Functions ###
 
