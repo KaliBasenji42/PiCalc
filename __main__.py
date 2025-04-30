@@ -171,7 +171,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     intResult = strAddInt(str1[0][1:], str2[0][1:])
     
     if fracResult[1]:
-      fracResult = fracResult[1:]
+      fracResult = (fracResult[1:], True)
       intResult = strAddInt(intResult[0], '1')
     
     # Out
