@@ -35,10 +35,8 @@ def splitFracStr(string): # Splits a string by the first "."
   
   index = string.find('.')
   
-  return string[:index-1], string[index:]
+  return string[:index], string[index+1:]
   
-
-print(splitFracStr('1.0'))
 
 ### String Based Math Functions ###
 
@@ -159,13 +157,30 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
   except:
     raise Exception('Non-numeric value')
   
+  str1 = splitFracStr(str1)
+  str2 = splitFracStr(str2)
+  
   if str1[0] == '-' and str2[0] == '-': # Both negative
     
+    # Calculate
     
+    fracResult = strAddInt(str1[1], str2[1])
+    intResult = strAddInt(str1[0][1:], str2[0][1:])
+    
+    if fracResult[1]: intResult = strAddInt(intResult, '1')
+    
+    # Out
+    
+    return '-' + intResult + '.' + fracResult
+    
+  
+  elif str1[0] == '-': # str1 negative
+    
+    pass
     
   
 
-print(strSum('1', '1'))
+print(strSum('-1', '-1'))
 
 ### Step Functions ###
 
