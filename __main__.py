@@ -35,6 +35,9 @@ def splitFracStr(string): # Splits a string by the first "."
   
   index = string.find('.')
   
+  if index == 0: return '0', string[1:]
+  if index < 0: return string, '0'
+  
   return string[:index], string[index+1:]
   
 
@@ -159,11 +162,6 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
   
   str1 = splitFracStr(str1)
   str2 = splitFracStr(str2)
-  
-  if str1[0] == '': str1 = ('0', str1[1])
-  if str1[1] == '': str1 = (str1[0], '0')
-  if str2[0] == '': str2 = ('0', str2[1])
-  if str2[1] == '': str2 = (str2[0], '0')
   
   if str1[0] == '-' and str2[0] == '-': # Both negative
     
