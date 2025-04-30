@@ -179,9 +179,33 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     return '-' + intResult[0] + '.' + fracResult[0]
     
   
-  elif str1[0] == '-': # str1 negative
+  elif str1[0] == '-' or str2[0] == '-': # 1 negative
     
-    pass
+    # Define negative and positive string
+    
+    if str1[0] == '-':
+      strNeg = str1
+      strPos = str2
+    else:
+      strNeg = str2
+      strPos = str1
+    
+    # Calculate
+    
+    fracResult = strSubInt(strPos[1], strNeg[1]) # Factional digits
+    intResult = strSubInt(strPos[0], strNeg[0][1:]) # Interger Digits
+    
+    if intResult[1]: # Re-calc. int
+      intResult = strSubInt() #!!!
+      
+    
+    if fracResult[1]: # If frac. digits overflow
+      fracResult = (strSubInt(strPos[1], strNeg[1]), True) # Re-calc. frac
+      intResult = strStrInt(intResult[0], '1') # Subtract 1 to int. digits
+    
+    # Out
+    
+    return '-' + intResult[0] + '.' + fracResult[0]
     
   
   else: # Both positive
