@@ -126,7 +126,9 @@ def strSubInt(str1, str2): # Adds 2 strings as if they where positive integers
     out = str(sumDig % 10) + out
     # Add digit to out
     
-    carry = (-sumDig + 10) // 10 # Carry over
+    carry = 0
+    if sumDig < 0: carry = 1
+    # Carry over
     
     DBStrC = str(carry)[0] + DBStrC # Debug
     
