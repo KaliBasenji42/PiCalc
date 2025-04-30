@@ -163,7 +163,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
   str1 = splitFracStr(str1)
   str2 = splitFracStr(str2)
   
-  if str1[0] == '-' and str2[0] == '-': # Both negative
+  if str1[0][0] == '-' and str2[0][0] == '-': # Both negative
     
     # Calculate
     
