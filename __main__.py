@@ -160,6 +160,11 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
   str1 = splitFracStr(str1)
   str2 = splitFracStr(str2)
   
+  if str1[0] == '': str1 = ('0', str1[1])
+  if str1[1] == '': str1 = (str1[0], '0')
+  if str2[0] == '': str2 = ('0', str2[1])
+  if str2[1] == '': str2 = (str2[0], '0')
+  
   if str1[0] == '-' and str2[0] == '-': # Both negative
     
     # Calculate
