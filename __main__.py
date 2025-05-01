@@ -6,7 +6,7 @@ import select
 import logging
 
 logging.basicConfig(
-    level=logging.ERROR,
+    level=logging.DEBUG,
     format='%(asctime)s | %(levelname)s: %(message)s',
     filename='app.log'
 )
@@ -43,18 +43,21 @@ def splitFracStr(string): # Splits a string by the first "."
 
 ### String Based Math Functions ###
 
-def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
+def strAddInt(str1, str2, frac = False): # Adds 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
+  # If Frac is set to True, it will format the strings as if they are fractional
   
   # Make equal length
   
   while len(str1) < len(str2):
-    str1 = '0' + str1
+    if frac: str1 = str1 + '0'
+    else: str1 = '0' + str1
   
   while len(str1) > len(str2):
-    str2 = '0' + str2
+    if frac: str2 = str2 + '0'
+    else: str2 = '0' + str2
   
-  DBStr = 'strAdd: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
+  DBStr = 'strAddInt: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
   # Debug string
   DBStrC = '' # Debug string for carry
   
@@ -98,19 +101,22 @@ def strAddInt(str1, str2): # Adds 2 strings as if they where positive integers
   # Return output and if it carried
   
 
-def strSubIntUnderFlow(str1, str2): # Subtracts 2 strings as if they where positive integers
+def strSubInt(str1, str2, frac = False): # Subtracts 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
   # Note: str1 must > str2
+  # If Frac is set to True, it will format the strings as if they are fractional
   
   # Make equal length
   
   while len(str1) < len(str2):
-    str1 = '0' + str1
+    if frac: str1 = str1 + '0'
+    else: str1 = '0' + str1
   
   while len(str1) > len(str2):
-    str2 = '0' + str2
+    if frac: str2 = str2 + '0'
+    else: str2 = '0' + str2
   
-  DBStr = 'strAdd: \n  ' + str1 + ' -\n  ' + str2 + ' =\n '
+  DBStr = 'strSubInt: \n  ' + str1 + ' -\n  ' + str2 + ' =\n '
   # Debug string
   DBStrC = '' # Debug string for carry
   
@@ -167,23 +173,36 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
     # Calculate
     
-    fracResult = strAddInt(str1[1], str2[1]) # Factional digits
+    fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
     intResult = strAddInt(str1[0][1:], str2[0][1:]) # Interger Digits
     
     if fracResult[1]: # If frac. digits overflow
       fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
       intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
     
+    # Debug
+    
+    logging.debug('strSum:\n  ' +
+                  str1[0] + '.' + str1[1] + ' +\n  ' +
+                  str2[0] + '.' + str2[1] + ' =\n  ' +
+                  '-' + intResult[0] + '.' + fracResult[0])
+    
     # Out
     
     return '-' + intResult[0] + '.' + fracResult[0]
     
   
-  elif str1[0] == '-' or str2[0] == '-': # 1 negative
+  elif str1[0][0] == '-' or str2[0][0] == '-': # 1 negative
+    
+    # Variiables
+    
+    fracUF = False # Fractional digitis underflow (should subtract 1 from int. digits)
+    
+    sign = '' # Sign of output
     
     # Define negative and positive string
     
-    if str1[0] == '-':
+    if str1[0][0] == '-':
       strNeg = str1
       strPos = str2
     else:
@@ -192,32 +211,49 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
     # Calculate
     
-    fracResult = strSubInt(strPos[1], strNeg[1]) # Factional digits
+    fracResult = strSubInt(strPos[1], strNeg[1][1:], frac = True) # Factional digits
     intResult = strSubInt(strPos[0], strNeg[0][1:]) # Interger Digits
     
-    if intResult[1]: # Re-calc. int
-      intResult = strSubInt() #!!!
+    if fracResult[1]: # If frac. digits underflow
+      fracResult = (strSubInt(strPos[1], strNeg[1]), True) # Re-calc. frac
+      intResult = strStrInt(intResult[0], '1') # Subtract 1 from int. digits
+      fracUF = True
+    
+    if intResult[1]: # If int. digits underflow
+      intResult = strSubInt(strNeg[0][1:], strPos[0]) # Re-calc. int
+      if fracUF: intResult = strAddInt(intResult[0], '1') # Subtract 1 from int. digits
+      sign = '-' # Change sign
       
     
-    if fracResult[1]: # If frac. digits overflow
-      fracResult = (strSubInt(strPos[1], strNeg[1]), True) # Re-calc. frac
-      intResult = strStrInt(intResult[0], '1') # Subtract 1 to int. digits
+    # Debug
+    
+    logging.debug('strSum:\n  ' +
+                  strPos[0] + '.' + strPos[1] + ' -\n  ' +
+                  strNeg[0][1:] + '.' + strNeg[1] + ' =\n  ' +
+                  sign + intResult[0] + '.' + fracResult[0])
     
     # Out
     
-    return '-' + intResult[0] + '.' + fracResult[0]
+    return sign + intResult[0] + '.' + fracResult[0]
     
   
   else: # Both positive
     
     # Calculate
     
-    fracResult = strAddInt(str1[1], str2[1]) # Factional digits
+    fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
     intResult = strAddInt(str1[0], str2[0]) # Interger Digits
     
     if fracResult[1]: # If frac. digits overflow
       fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
       intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
+    
+    # Debug
+    
+    logging.debug('strSum:\n  ' +
+                  str1[0] + '.' + str1[1] + ' +\n  ' +
+                  str2[0] + '.' + str2[1] + ' =\n  ' +
+                  intResult[0] + '.' + fracResult[0])
     
     # Out
     
@@ -225,7 +261,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
   
 
-print(strSum('.1', '.9'))
+print(strSum('0.99', '9.01'))
 
 ### Step Functions ###
 
