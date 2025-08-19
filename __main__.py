@@ -261,11 +261,28 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
   
 
-print(strSum('0.99', '9.01'))
-
 ### Step Functions ###
 
 ### Pre-Loop ###
+
+# License
+
+print(
+  'PiCalc\n'
+  'Copyright (C) 2025 KaliBasenji42\n'
+  '\n'
+  'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
+  '\n'
+  'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
+  '\n'
+  'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
+  '\n'
+  'Attached License: LICENSE.md\n'
+  'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
+  'KaliBasenji42\'s Github: https://github.com/KaliBasenji42\n'
+)
+
+print(strSum('0.99', '9.01'))
 
 ### Main Loop ###
 
