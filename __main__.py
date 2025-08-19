@@ -15,14 +15,14 @@ logging.debug('New Run: ')
 ### Variables ###
 
 run = True # Run Main Loop
-pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and sould not be returned
+pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and should not be returned
 method = 0 # Method for calculating pi. 0: Nilakantha, 1: BBP
 
 piStr = '' # Apprx of pi, stored as string
 
 ### (Basic) Functions ###
 
-def detectKey(): # Detects key press (used for exiting graph loop)
+def detectKey(): # Detects key press (used for exiting loop)
   
   if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
     key = sys.stdin.read(1)
@@ -45,7 +45,7 @@ def splitFracStr(string): # Splits a string by the first "."
 
 def strAddInt(str1, str2, frac = False): # Adds 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
-  # If Frac is set to True, it will format the strings as if they are fractional
+  # If Frac is set to True, it will format the strings as if they are fractional/decimals
   
   # Make equal length
   
@@ -104,7 +104,7 @@ def strAddInt(str1, str2, frac = False): # Adds 2 strings as if they where posit
 def strSubInt(str1, str2, frac = False): # Subtracts 2 strings as if they where positive integers
   # Format: "...###" (Any positive integer)
   # Note: str1 must > str2
-  # If Frac is set to True, it will format the strings as if they are fractional
+  # If Frac is set to True, it will format the strings as if they are fractional/decimal
   
   # Make equal length
   
@@ -174,7 +174,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     # Calculate
     
     fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
-    intResult = strAddInt(str1[0][1:], str2[0][1:]) # Interger Digits
+    intResult = strAddInt(str1[0][1:], str2[0][1:]) # Integer Digits
     
     if fracResult[1]: # If frac. digits overflow
       fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
@@ -194,9 +194,9 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
   
   elif str1[0][0] == '-' or str2[0][0] == '-': # 1 negative
     
-    # Variiables
+    # Variables
     
-    fracUF = False # Fractional digitis underflow (should subtract 1 from int. digits)
+    fracUF = False # Fractional digits underflow (should subtract 1 from int. digits)
     
     sign = '' # Sign of output
     
@@ -212,7 +212,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     # Calculate
     
     fracResult = strSubInt(strPos[1], strNeg[1][1:], frac = True) # Factional digits
-    intResult = strSubInt(strPos[0], strNeg[0][1:]) # Interger Digits
+    intResult = strSubInt(strPos[0], strNeg[0][1:]) # Integer Digits
     
     if fracResult[1]: # If frac. digits underflow
       fracResult = (strSubInt(strPos[1], strNeg[1]), True) # Re-calc. frac
@@ -242,7 +242,7 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     # Calculate
     
     fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
-    intResult = strAddInt(str1[0], str2[0]) # Interger Digits
+    intResult = strAddInt(str1[0], str2[0]) # Integer Digits
     
     if fracResult[1]: # If frac. digits overflow
       fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
@@ -270,17 +270,24 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
 print(
   'PiCalc\n'
   'Copyright (C) 2025 KaliBasenji42\n'
-  '\n'
-  'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
-  '\n'
-  'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
-  '\n'
-  'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
-  '\n'
-  'Attached License: LICENSE.md\n'
-  'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
-  'KaliBasenji42\'s Github: https://github.com/KaliBasenji42\n'
 )
+
+if(input('Show license details? (y = yes, *any* = no): ').lower() == 'y'):
+  print(
+    '\n'
+    'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
+    '\n'
+    'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
+    '\n'
+    'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
+    '\n'
+    'Attached License: LICENSE.md\n'
+    'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
+    'KaliBasenji42\'s Github: https://github.com/KaliBasenji42'
+  )
+  
+
+print('')
 
 print(strSum('0.99', '9.01'))
 
