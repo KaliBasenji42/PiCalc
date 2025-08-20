@@ -15,10 +15,23 @@ logging.debug('New Run: ')
 ### Variables ###
 
 run = True # Run Main Loop
+calculating = False # Run calculating loop
 pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and should not be returned
 method = 0 # Method for calculating pi. 0: Nilakantha, 1: BBP
 
 piStr = '' # Apprx of pi, stored as string
+
+licenseDetails = (
+  'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
+  '\n'
+  'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
+  '\n'
+  'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
+  '\n'
+  'Attached License: LICENSE.md\n'
+  'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
+  'KaliBasenji42\'s Github: https://github.com/KaliBasenji42'
+)
 
 ### (Basic) Functions ###
 
@@ -39,6 +52,16 @@ def splitFracStr(string): # Splits a string by the first "."
   if index < 0: return string, '0'
   
   return string[:index], string[index+1:]
+  
+
+def save(name): # Save file
+  
+  pass
+  
+
+def load(name): # Load file
+  
+  pass
   
 
 ### String Based Math Functions ###
@@ -158,7 +181,7 @@ def strSubInt(str1, str2, frac = False): # Subtracts 2 strings as if they where 
   
 
 def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if they where floats
-  # Format: "-###.###..." (Any float, may be negative)
+  # Format: "-...###.###..." (Any float, may be negative)
   
   try: # Throw if non-numeric
     float(str1)
@@ -261,6 +284,14 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
   
 
+def strDivide(str1, str2, maxDigits): # Divides 2 strings as if they where floats
+  # Format: "-...###.###..." (Any float, may be negative)
+  # MaxDigits is the number of digits it should return after 
+  #   For example if caught in an infinite loop due to division by 3
+  
+  # 
+  
+
 ### Step Functions ###
 
 ### Pre-Loop ###
@@ -272,24 +303,14 @@ print(
   'Copyright (C) 2025 KaliBasenji42\n'
 )
 
-if(input('Show license details? (y = yes, *any* = no): ').lower() == 'y'):
-  print(
-    '\n'
-    'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
-    '\n'
-    'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
-    '\n'
-    'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
-    '\n'
-    'Attached License: LICENSE.md\n'
-    'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
-    'KaliBasenji42\'s Github: https://github.com/KaliBasenji42'
-  )
-  
+print(
+  'Enter "q" to quit\n'
+  'Enter "s" to be prompted file name to save (do not list file extension)\n'
+  'Enter "l" to be prompted file name to load (do not list file extension)\n'
+  'Enter "license" to show license details\n'
+)
 
-print('')
-
-print(strSum('0.99', '9.01'))
+print(strSum('0.99', '19.01'))
 
 ### Main Loop ###
 
@@ -297,7 +318,43 @@ try:
   
   while run:
     
-    break
+    # Inputs
+    
+    print('')
+    inp = input('Input: ').lower()
+    print('')
+    
+    if(inp == 'q'): run = False # Quit
+    
+    if(inp == 'license'): print(licenseDetails) # License
+    
+    if(inp == 's'): # Save
+      
+      fileName = input('File name: ')
+      
+      print('')
+      pint(save(fileName))
+      
+    
+    if(inp == 'l'): # Load
+      
+      fileName = input('File name: ')
+      
+      print('')
+      print(load(fileName))
+      
+    
+    # Calculating Loop
+    
+    while calculating:
+      
+      # Exit
+      
+      key = detectKey()
+      
+      if(key == 'q'):
+        break
+      
     
   
 
