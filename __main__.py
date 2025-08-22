@@ -18,8 +18,11 @@ run = True # Run Main Loop
 calculating = False # Run calculating loop
 pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and should not be returned
 method = 0 # Method for calculating pi. 0: Nilakantha, 1: BBP
+methods = ['Nilakantha', 'BBP'] # Used as dictionary for method
 
-piStr = '' # Apprx of pi, stored as string
+piStrs = [] # List of apprx of pi, stored as string
+              # Array is rolled, to check digit progress
+numPiStrs = 5 # Number of strings listed in piStrs, determines how quickly digit stability is satisfied
 
 licenseDetails = (
   'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
@@ -284,12 +287,92 @@ def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if th
     
   
 
-def strDivide(str1, str2, maxDigits): # Divides 2 strings as if they where floats
+def strLessThan(str1, str2): # Compares 2 strings, returns True if str1 < str2
+  # Format: "-...###.###..." (Any float, may be negative)
+  
+  # Negative Cases
+  
+  if str1[0] == '-' and str2[0] != '-': return True
+  if str1[0] != '-' and str2[0] == '-': return False
+  
+  # Variables
+  
+  out = False # Output
+  
+  bothNegative = str1[0] == '-' and str2[0] == '-' # If both are negative (will return opposite if True)
+  
+  str1Split = splitFracStr(str1) # Tuple of split input strings
+  str2Split = splitFracStr(str2)
+  
+  str1Arr = [str1Split[0].replace('-', ''), str1Split[1]] # Arrays for both strings (to split fractional and integer parts)
+  str2Arr = [str2Split[0].replace('-', ''), str2Split[1]]
+  
+  # Make equal length
+  
+  while len(str1Arr[0]) < len(str2Arr[0]): # While the integer part of str1 is shorter than str2's...
+    str1Arr[0] = '0' + str1Arr[0] # ...lengthen it
+  
+  while len(str1Arr[0]) > len(str2Arr[0]): # While the integer part of str2 is shorter than str1's...
+    str2Arr[0] = '0' + str2Arr[0] # ...lengthen it
+  
+  while len(str1Arr[1]) < len(str2Arr[1]): # While the fractional part of str1 is shorter than str2's...
+    str1Arr[1] = str1Arr[1] + '0' # ...lengthen it
+  
+  while len(str1Arr[1]) > len(str2Arr[1]): # While the fractional part of str2 is shorter than str1's...
+    str2Arr[1] = str2Arr[1] + '0' # ...lengthen it
+  
+  # Loop
+  
+  for i in range(len(str1Arr[0])): # Loop for integer digits
+    if(str1Arr[0][i] < str2Arr[0][i]):
+      out = True # str1 < str2
+      break
+    if(str1Arr[0][i] > str2Arr[0][i]):
+      out = False # str1 > str2
+      break
+  
+  for i in range(len(str1Arr[1])): # Loop for fractional digits
+    if(str1Arr[1][i] < str2Arr[1][i]):
+      out = True # str1 < str2
+      break
+    if(str1Arr[1][i] > str2Arr[1][i]):
+      out = False # str1 > str2
+      break
+  
+  # Base case (==)
+  
+  out = False
+  
+  # Return
+  
+  if(bothNegative): return not(out)
+  else: return out
+  
+
+def strDivide(dividendStr, divisorStr, maxDigits): # Divides 2 strings as if they where floats
   # Format: "-...###.###..." (Any float, may be negative)
   # MaxDigits is the number of digits it should return after 
   #   For example if caught in an infinite loop due to division by 3
   
-  # 
+  # Divide by 0
+  
+  numOnlyDivisor = divisor.replace('-', '').replace('.', '')
+  divisorIsZero = True
+  
+  for digit in numOnlyDivisor: # Check each digit
+    if digit != '0':
+      divisorIsZero = False
+      break
+      
+    
+  
+  if divisorIsZero: raise Exception('Division by Zero')
+    
+  # Variables
+  
+  negative = (str1[0] == '-') ^ (str2[0] == '-')
+  
+  dividendPos = len(dividendStr.replace('-', '').replace('.', ''))
   
 
 ### Step Functions ###
@@ -310,7 +393,7 @@ print(
   'Enter "license" to show license details\n'
 )
 
-print(strSum('0.99', '19.01'))
+print(strLessThan('00.00', '00.01'))
 
 ### Main Loop ###
 
@@ -324,11 +407,11 @@ try:
     inp = input('Input: ').lower()
     print('')
     
-    if(inp == 'q'): run = False # Quit
+    if inp == 'q': run = False # Quit
     
-    if(inp == 'license'): print(licenseDetails) # License
+    if inp == 'license': print(licenseDetails) # License
     
-    if(inp == 's'): # Save
+    if inp == 's': # Save
       
       fileName = input('File name: ')
       
@@ -336,7 +419,7 @@ try:
       pint(save(fileName))
       
     
-    if(inp == 'l'): # Load
+    if inp == 'l': # Load
       
       fileName = input('File name: ')
       
@@ -352,7 +435,7 @@ try:
       
       key = detectKey()
       
-      if(key == 'q'):
+      if key == 'q':
         break
       
     
