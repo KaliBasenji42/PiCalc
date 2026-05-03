@@ -42,18 +42,22 @@ tickTime = time.time() # Time tick started for spt
 
 start = time.time() # Start time
 tickStart = time.time() # Start time for tick
+actualTps = 0 # Actual ticks per second for info
 
 # Calculation
 
-piFrac = fractions.Fraction() # Fraction for storing pi approximation
+piFrac = fractions.Fraction(0, 1) # Fraction for storing pi approximation
 piDec = decimal.Decimal('0') # Decimal representation of pi approximation
 piDecPrev = decimal.Decimal('0') # Old decimal representation of pi approximation
 
 method = '' # Method used for calculating pi
 
-digitStabilities = [] # Array of how recently a digit changed
+digitStabilities = [] # Array of how recently a digit changed 
+# 0 is most stable, starts at threshold and subtracts
 stabilityThreshold = 8 # How long a digit has to stay the same to be considered stable
 digitBuffer = 16 # Digits calculated after last consecutive stable digit
+stableDigits = 0 # Number of consecutive stable digits
+digits = 16 # Number of digits to calculate to
 
 ### Functions ###
 
@@ -68,6 +72,7 @@ def readConfig(): # Read config file
   global method
   global stabilityThreshold
   global digitBuffer
+  global digits
   
   # Read Files
   
@@ -80,10 +85,108 @@ def readConfig(): # Read config file
   method = data['method']
   stabilityThreshold = data['stabilityThreshold']
   digitBuffer = data['digitBuffer']
+  digits = data['digitBuffer'] # Initial value
   
 
 # Calculation
 
+def GregoryLeibniz(n):
+  
+  global piFrac
+  
+  piFrac += fractions.Fraction(
+    ((-1) ** n) * 4,
+    2 * n + 1
+  )
+  
+  #logging.debug(piFrac)
+  
+
+def BaileyBorweinPlouffe(n):
+  
+  global piFrac
+  
+  piFrac += (
+    fractions.Fraction(1,16 ** n) * (
+      fractions.Fraction(4, 8 * n + 1) -
+      fractions.Fraction(2, 8 * n + 4) -
+      fractions.Fraction(1, 8 * n + 5) -
+      fractions.Fraction(1, 8 * n + 6)
+    )
+  )
+  
+
+# Decimal / Digit
+
+def digitStr(string): # Returns string with only numeric values
+  
+  out = ''
+  
+  for char in string:
+    if char.isnumeric():
+      out += char
+    
+  
+  return out
+  
+
+def getWholeDigits(string): # Returns number of digits before decimal
+  
+  out = 0
+  
+  for char in string:
+    if char.isnumeric():
+      out += 1
+    elif char == '.':
+      break
+  
+  return out
+  
+
+def getStableDigits(stabilities): # Returns how many digits are consecutively stable
+  
+  out = 0
+  
+  for stab in stabilities:
+    if stab == 0:
+      out += 1
+    else:
+      break
+  
+  return out
+  
+
+def generateDigitStabilities(dec, decPrev):
+  
+  global digitStabilities
+  
+  # Digit Strings
+  
+  decDigits = digitStr(str(dec))
+  decDigitsPrev = digitStr(str(decPrev))
+  
+  # Lengthen
+  
+  for i in range(len(decDigits) - len(decDigitsPrev)):
+    decDigitsPrev += '0'
+  
+  for i in range(len(decDigits) - len(digitStabilities)):
+    digitStabilities.append(stabilityThreshold)
+  
+  # Check
+  
+  for i in range(len(decDigits)):
+    
+    if(decDigits[i] == decDigitsPrev[i]): # Match 
+      
+      digitStabilities[i] = max(0, digitStabilities[i] - 1) # -1, min 0
+      
+    else: # Else
+      
+      digitStabilities[i] = stabilityThreshold # Reset
+      
+    
+  
 
 # Rendering
 
@@ -153,7 +256,43 @@ def render():
   
   screen += '\033[94mTick: ' + str(tick) + ' | '
   screen += '' + str(round(time.time() - start, 4)) + ' s | '
-  screen += str(round(1 / (time.time() - tickStart), 4)) + ' tps\033[0m\n'
+  screen += str(round(actualTps, 4)) + ' tps\033[0m\n'
+  
+  screen += '\033[95mStable Digits: ' + str(stableDigits) + '\033[0m\n'
+  
+  # Pi
+  
+  piStr = '' # String for pi
+  
+  index = 0 # Index for \/
+  
+  for char in str(piDec):
+    
+    if char.isnumeric():
+      
+      stability = digitStabilities[index]
+      
+      hueVal = 2 * 255 # Green
+      hueVal -= (stability / stabilityThreshold) * (2 * 255) # Stability 0-1 * Green (Green - Red)
+      
+      if stability == 0: hueVal = 3 * 255 # Cyan
+      
+      piStr += hue(hueVal) # Color
+      
+      piStr += char # Character
+      
+      piStr += '\033[0m' # Reset
+      
+      index += 1 # Iterate
+      
+    
+    else: # Not number
+      
+      piStr += char # Add
+      
+    
+  
+  screen += piStr + '\n'
   
   # Clear and Print
   
@@ -179,11 +318,14 @@ def main():
   global tickTime
   global start
   global tickStart
+  global actualTps
   
   global piFrac
   global piDec
   global piDecPrev
   global digitStabilities
+  global digits
+  global stableDigits
   
   # Main Loop
   
@@ -191,7 +333,9 @@ def main():
   
   while True:
     
-    # Clock
+    ### Clock ###
+    
+    tickStart = time.time() # Start of tick
     
     tick += 1 # Iterate time ticker
     
@@ -199,15 +343,38 @@ def main():
     time.sleep(max(0, spt - elapsed)) # Pause
     tickTime = time.time() # Update frame time
     
-    # Calculate
+    ### Calculate ###
     
+    # Fraction math
     
+    if(method == 'Gregory–Leibniz'):
+      GregoryLeibniz(tick-1)
+    elif(method == 'Bailey–Borwein–Plouffe'):
+      BaileyBorweinPlouffe(tick-1)
     
-    # Render
+    # Decimal
     
-    render()
+    decimal.getcontext().prec = digits # Set precision
     
-    tickStart = time.time() # Start time
+    piDecPrev = piDec # Prev
+    piDec = decimal.Decimal(piFrac.numerator) / decimal.Decimal(piFrac.denominator) # New
+    
+    generateDigitStabilities(piDec, piDecPrev)
+    stableDigits = getStableDigits(digitStabilities)
+    
+    digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Re-calculate digit precision
+    
+    #logging.debug('Frac: ' + str(piFrac))
+    #logging.debug('Dec: ' + str(piDec))
+    #logging.debug('Stabilities: ' + str(digitStabilities))
+    #logging.debug('Digits: ' + str(digits))
+    
+    ### Render ###
+    
+    try: render()
+    except: logging.exception('Rendering Error')
+    
+    actualTps = 1 / (time.time() - tickStart) # Actual ticks per second
     
   
 

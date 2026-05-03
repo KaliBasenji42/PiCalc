@@ -1,9 +1,14 @@
 {
   "Ticks (frames/calculations) per second cap": "comment",
-  "tps": 4,
+  "tps": 16,
   
   "Method used for calculating pi (or other value)": "comment",
-  "method": "",
+  "method": "Bailey–Borwein–Plouffe",
+  "Options (comment)": [
+    "Gregory–Leibniz",
+    "Bailey–Borwein–Plouffe",
+    "BBP-Newton"
+  ],
   
   "How long a digit has to stay the same to be considered stable": "comment",
   "stabilityThreshold": 8,
