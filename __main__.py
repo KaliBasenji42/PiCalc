@@ -1,446 +1,205 @@
-### Import ###
+# PiCalc
+# Copyright (C) 2026 KaliBasenji42
 
-import sys
+# This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.
+
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+# License: ../LICENSE.md
+# GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html
+# KaliBasenji42's Github: https://github.com/KaliBasenji42
+
+### Imports ###
+
+import os
 import time
-import select
+import random
+import json
+import fractions
+import decimals
 import logging
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s | %(levelname)s: %(message)s',
-    filename='app.log'
+  level=logging.DEBUG,
+  format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
+  filename='app.log'
 )
-logging.debug('New Run: ')
+logging.debug('New Run')
 
 ### Variables ###
 
+# Files
+
+configPath = 'config.json' # Path to config file
+
+# Control
+
 run = True # Run Main Loop
-calculating = False # Run calculating loop
-pastKeys = [''] * 4 # To detect if a key was an arrow/escape key, and should not be returned
-method = 0 # Method for calculating pi. 0: Nilakantha, 1: BBP
-methods = ['Nilakantha', 'BBP'] # Used as dictionary for method
+spc = 1/4 # Second per Calculation
+tick = 0 # Time ticker
+calcTime = time.time() # Time calc started for spc
 
-piStrs = [] # List of apprx of pi, stored as string
-              # Array is rolled, to check digit progress
-numPiStrs = 5 # Number of strings listed in piStrs, determines how quickly digit stability is satisfied
+# Calculation
 
-licenseDetails = (
-  'This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; version 2 of the License.\n'
-  '\n'
-  'This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.\n'
-  '\n'
-  'You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.\n'
-  '\n'
-  'Attached License: LICENSE.md\n'
-  'GPL v2: https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html\n'
-  'KaliBasenji42\'s Github: https://github.com/KaliBasenji42'
-)
+piFrac = fractions.Fraction() # Fraction for storing pi approximation
+piDec = decimals.Decimal('0') # Decimal representation of pi approximation
+piDecPrev = decimals.Decimal('0') # Old decimal representation of pi approximation
 
-### (Basic) Functions ###
+method = '' # Method used for calculating pi
 
-def detectKey(): # Detects key press (used for exiting loop)
-  
-  if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-    key = sys.stdin.read(1)
-    return key
-  
-  return None
-  
+digitStabilities = [] # Array of how recently a digit changed
+stabilityThreshold = 8 # How long a digit has to stay the same to be considered stable
+digitBuffer = 16 # Digits calculated after last consecutive stable digit
 
-def splitFracStr(string): # Splits a string by the first "."
-  
-  index = string.find('.')
-  
-  if index == 0: return '0', string[1:]
-  if index < 0: return string, '0'
-  
-  return string[:index], string[index+1:]
-  
+### Functions ###
 
-def save(name): # Save file
-  
-  pass
-  
+# File
 
-def load(name): # Load file
-  
-  pass
-  
-
-### String Based Math Functions ###
-
-def strAddInt(str1, str2, frac = False): # Adds 2 strings as if they where positive integers
-  # Format: "...###" (Any positive integer)
-  # If Frac is set to True, it will format the strings as if they are fractional/decimals
-  
-  # Make equal length
-  
-  while len(str1) < len(str2):
-    if frac: str1 = str1 + '0'
-    else: str1 = '0' + str1
-  
-  while len(str1) > len(str2):
-    if frac: str2 = str2 + '0'
-    else: str2 = '0' + str2
-  
-  DBStr = 'strAddInt: \n  ' + str1 + ' +\n  ' + str2 + ' =\n '
-  # Debug string
-  DBStrC = '' # Debug string for carry
-  
-  # Compute
-  
-  out = ''
-  carry = 0
-  
-  for i in range(len(str1)):
-    
-    i = i + 1
-    
-    if not str1[-i].isnumeric() or not str2[-i].isnumeric():
-      raise Exception('Non-numeric value')
-      # Throw if either not numeric
-    
-    sumDig = int(str1[-i]) + int(str2[-i]) + carry
-    # Add current digits & carry
-    
-    out = str(sumDig % 10) + out
-    # Add digit to out
-    
-    carry = sumDig // 10 # Carry over
-    
-    DBStrC = str(carry)[0] + DBStrC # Debug
-    
-  
-  # Final Carry
-  
-  if carry > 0: out = str(carry) + out
-  
-  # Debug
-  
-  if carry > 0: DBStr = DBStr + DBStrC + '\n ' + out
-  else: DBStr = DBStr + DBStrC + '\n  ' + out
-  logging.debug(DBStr)
-  
-  # Return
-  
-  return out, carry > 0
-  # Return output and if it carried
-  
-
-def strSubInt(str1, str2, frac = False): # Subtracts 2 strings as if they where positive integers
-  # Format: "...###" (Any positive integer)
-  # Note: str1 must > str2
-  # If Frac is set to True, it will format the strings as if they are fractional/decimal
-  
-  # Make equal length
-  
-  while len(str1) < len(str2):
-    if frac: str1 = str1 + '0'
-    else: str1 = '0' + str1
-  
-  while len(str1) > len(str2):
-    if frac: str2 = str2 + '0'
-    else: str2 = '0' + str2
-  
-  DBStr = 'strSubInt: \n  ' + str1 + ' -\n  ' + str2 + ' =\n '
-  # Debug string
-  DBStrC = '' # Debug string for carry
-  
-  # Compute
-  
-  out = ''
-  carry = 0
-  
-  for i in range(len(str1)):
-    
-    i = i + 1
-    
-    if not str1[-i].isnumeric() or not str2[-i].isnumeric():
-      raise Exception('Non-numeric value')
-      # Throw if either not numeric
-    
-    sumDig = int(str1[-i]) - int(str2[-i]) - carry
-    # Add current digits & carry
-    
-    out = str(sumDig % 10) + out
-    # Add digit to out
-    
-    carry = 0
-    if sumDig < 0: carry = 1
-    # Carry over
-    
-    DBStrC = str(carry)[0] + DBStrC # Debug
-    
-  
-  # Debug
-  
-  DBStr = DBStr + DBStrC + '\n  ' + out
-  logging.debug(DBStr)
-  
-  # Return
-  
-  return out, carry > 0
-  # Return output and if it underflowed
-  
-
-def strSum(str1, str2): # Uses strAddInt and strSubInt to sum 2 strings as if they where floats
-  # Format: "-...###.###..." (Any float, may be negative)
-  
-  try: # Throw if non-numeric
-    float(str1)
-    float(str2)
-  except:
-    raise Exception('Non-numeric value')
-  
-  str1 = splitFracStr(str1)
-  str2 = splitFracStr(str2)
-  
-  if str1[0][0] == '-' and str2[0][0] == '-': # Both negative
-    
-    # Calculate
-    
-    fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
-    intResult = strAddInt(str1[0][1:], str2[0][1:]) # Integer Digits
-    
-    if fracResult[1]: # If frac. digits overflow
-      fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
-      intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
-    
-    # Debug
-    
-    logging.debug('strSum:\n  ' +
-                  str1[0] + '.' + str1[1] + ' +\n  ' +
-                  str2[0] + '.' + str2[1] + ' =\n  ' +
-                  '-' + intResult[0] + '.' + fracResult[0])
-    
-    # Out
-    
-    return '-' + intResult[0] + '.' + fracResult[0]
-    
-  
-  elif str1[0][0] == '-' or str2[0][0] == '-': # 1 negative
-    
-    # Variables
-    
-    fracUF = False # Fractional digits underflow (should subtract 1 from int. digits)
-    
-    sign = '' # Sign of output
-    
-    # Define negative and positive string
-    
-    if str1[0][0] == '-':
-      strNeg = str1
-      strPos = str2
-    else:
-      strNeg = str2
-      strPos = str1
-    
-    # Calculate
-    
-    fracResult = strSubInt(strPos[1], strNeg[1][1:], frac = True) # Factional digits
-    intResult = strSubInt(strPos[0], strNeg[0][1:]) # Integer Digits
-    
-    if fracResult[1]: # If frac. digits underflow
-      fracResult = (strSubInt(strPos[1], strNeg[1]), True) # Re-calc. frac
-      intResult = strStrInt(intResult[0], '1') # Subtract 1 from int. digits
-      fracUF = True
-    
-    if intResult[1]: # If int. digits underflow
-      intResult = strSubInt(strNeg[0][1:], strPos[0]) # Re-calc. int
-      if fracUF: intResult = strAddInt(intResult[0], '1') # Subtract 1 from int. digits
-      sign = '-' # Change sign
-      
-    
-    # Debug
-    
-    logging.debug('strSum:\n  ' +
-                  strPos[0] + '.' + strPos[1] + ' -\n  ' +
-                  strNeg[0][1:] + '.' + strNeg[1] + ' =\n  ' +
-                  sign + intResult[0] + '.' + fracResult[0])
-    
-    # Out
-    
-    return sign + intResult[0] + '.' + fracResult[0]
-    
-  
-  else: # Both positive
-    
-    # Calculate
-    
-    fracResult = strAddInt(str1[1], str2[1], frac = True) # Factional digits
-    intResult = strAddInt(str1[0], str2[0]) # Integer Digits
-    
-    if fracResult[1]: # If frac. digits overflow
-      fracResult = (fracResult[0][1:], True) # Remove first digit from frac. digits
-      intResult = strAddInt(intResult[0], '1') # Add 1 to int. digits
-    
-    # Debug
-    
-    logging.debug('strSum:\n  ' +
-                  str1[0] + '.' + str1[1] + ' +\n  ' +
-                  str2[0] + '.' + str2[1] + ' =\n  ' +
-                  intResult[0] + '.' + fracResult[0])
-    
-    # Out
-    
-    return intResult[0] + '.' + fracResult[0]
-    
-  
-
-def strLessThan(str1, str2): # Compares 2 strings, returns True if str1 < str2
-  # Format: "-...###.###..." (Any float, may be negative)
-  
-  # Negative Cases
-  
-  if str1[0] == '-' and str2[0] != '-': return True
-  if str1[0] != '-' and str2[0] == '-': return False
+def readConfig(): # Read config file
   
   # Variables
   
-  out = False # Output
+  global spc
   
-  bothNegative = str1[0] == '-' and str2[0] == '-' # If both are negative (will return opposite if True)
+  global method
+  global stabilityThreshold
+  global digitBuffer
   
-  str1Split = splitFracStr(str1) # Tuple of split input strings
-  str2Split = splitFracStr(str2)
+  # Read Files
   
-  str1Arr = [str1Split[0].replace('-', ''), str1Split[1]] # Arrays for both strings (to split fractional and integer parts)
-  str2Arr = [str2Split[0].replace('-', ''), str2Split[1]]
+  with open(configPath, 'r') as file: data = json.loads(file.read())
   
-  # Make equal length
+  # Set variables
   
-  while len(str1Arr[0]) < len(str2Arr[0]): # While the integer part of str1 is shorter than str2's...
-    str1Arr[0] = '0' + str1Arr[0] # ...lengthen it
+  spc = 1 / data['cps']
   
-  while len(str1Arr[0]) > len(str2Arr[0]): # While the integer part of str2 is shorter than str1's...
-    str2Arr[0] = '0' + str2Arr[0] # ...lengthen it
+  method = data['method']
+  stabilityThreshold = data['stabilityThreshold']
+  digitBuffer = data['digitBuffer']
   
-  while len(str1Arr[1]) < len(str2Arr[1]): # While the fractional part of str1 is shorter than str2's...
-    str1Arr[1] = str1Arr[1] + '0' # ...lengthen it
+
+# Calculation
+
+
+# Rendering
+
+def hue(x, fMin = 0, fMax = 255): # Returns hue color
   
-  while len(str1Arr[1]) > len(str2Arr[1]): # While the fractional part of str2 is shorter than str1's...
-    str2Arr[1] = str2Arr[1] + '0' # ...lengthen it
+  # Variables
   
-  # Loop
+  fRange = fMax - fMin # Function range
   
-  for i in range(len(str1Arr[0])): # Loop for integer digits
-    if(str1Arr[0][i] < str2Arr[0][i]):
-      out = True # str1 < str2
-      break
-    if(str1Arr[0][i] > str2Arr[0][i]):
-      out = False # str1 > str2
-      break
+  # RGB
   
-  for i in range(len(str1Arr[1])): # Loop for fractional digits
-    if(str1Arr[1][i] < str2Arr[1][i]):
-      out = True # str1 < str2
-      break
-    if(str1Arr[1][i] > str2Arr[1][i]):
-      out = False # str1 > str2
-      break
+  # Based off of:
+  # f(x) = -| ( ( x + n r ) % 6r ) -3r | + 2r + m
+  #   where: 
+  #     "n" depends on wether its red, green, or blue:
+  #       red: -3
+  #       green: 1
+  #       blue: -1
+  #     "r" is range ( max - min )
+  #     "m" is min
+  # f(x) is clamped to min and max: max( min( f(x), max ), min ) 
   
-  # Base case (==)
+  red = x - ( 3 * fRange ) # Subtract 3 Range
+  red = red % ( 6 * fRange ) # Mod 6 Range
+  red = red - ( 3 * fRange ) # Subtract 3 Range
+  red = -abs(red) # - abs
+  red = red + ( 2 * fRange ) # Add 2 Range
+  red = red + fMin # Add min
+  red = min( red, fMax ) # min
+  red = max( red, fMin ) # max
+  red = str(int(red)) # Str of int
   
-  out = False
+  green = x + ( fRange ) # Add 1 Range
+  green = green % ( 6 * fRange ) # Mod 6 Range
+  green = green - ( 3 * fRange ) # Subtract 3 Range
+  green = -abs(green) # - abs
+  green = green + ( 2 * fRange ) # Add 2 Range
+  green = green + fMin # Add min
+  green = min( green, fMax ) # min
+  green = max( green, fMin ) # max
+  green = str(int(green)) # Str of int
+  
+  blue = x - ( fRange ) # Subtract 1 Range
+  blue = blue % ( 6 * fRange ) # Mod 6 Range
+  blue = blue - ( 3 * fRange ) # Subtract 3 Range
+  blue = -abs(blue) # - abs
+  blue = blue + ( 2 * fRange ) # Add 2 Range
+  blue = blue + fMin # Add min
+  blue = min( blue, fMax ) # min
+  blue = max( blue, fMin ) # max
+  blue = str(int(blue)) # Str of int
   
   # Return
   
-  if(bothNegative): return not(out)
-  else: return out
+  return '\033[38;2;' + red + ';' + green + ';' + blue + 'm'
   
 
-def strDivide(dividendStr, divisorStr, maxDigits): # Divides 2 strings as if they where floats
-  # Format: "-...###.###..." (Any float, may be negative)
-  # MaxDigits is the number of digits it should return after 
-  #   For example if caught in an infinite loop due to division by 3
+def render():
   
-  # Divide by 0
+  screen = '' # What to print
   
-  numOnlyDivisor = divisor.replace('-', '').replace('.', '')
-  divisorIsZero = True
+  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to quit [ctrl + C]' # Title
   
-  for digit in numOnlyDivisor: # Check each digit
-    if digit != '0':
-      divisorIsZero = False
-      break
-      
-    
+  screen += hue(0)
   
-  if divisorIsZero: raise Exception('Division by Zero')
-    
-  # Variables
+  screen += 'Time: ' + ticker + '\n' # Info
   
-  negative = (str1[0] == '-') ^ (str2[0] == '-')
+  os.system('clear') # Clear
   
-  dividendPos = len(dividendStr.replace('-', '').replace('.', ''))
+  print(screen, end='') # Print Screen
   
-
-### Step Functions ###
-
-### Pre-Loop ###
-
-# License
-
-print(
-  'PiCalc\n'
-  'Copyright (C) 2025 KaliBasenji42\n'
-)
-
-print(
-  'Enter "q" to quit\n'
-  'Enter "s" to be prompted file name to save (do not list file extension)\n'
-  'Enter "l" to be prompted file name to load (do not list file extension)\n'
-  'Enter "license" to show license details\n'
-)
-
-print(strLessThan('00.00', '00.01'))
 
 ### Main Loop ###
 
-try:
+def main():
+  
+  # Global Variables
+  
+  global run
+  global spc
+  global tick
+  global calcTime
+  
+  global piFrac
+  global piDec
+  global piDecPrev
+  global digitStabilities
+  
+  # Main Loop
   
   while run:
     
-    # Inputs
+    # Clock
     
-    print('')
-    inp = input('Input: ').lower()
-    print('')
+    tick += 1 # Iterate time ticker
     
-    if inp == 'q': run = False # Quit
+    elapsed = time.time() - calcTime # Time since last frame
+    time.sleep(max(0, spc - elapsed)) # Pause
+    calcTime = time.time() # Update frame time
     
-    if inp == 'license': print(licenseDetails) # License
+    # Calculate
     
-    if inp == 's': # Save
-      
-      fileName = input('File name: ')
-      
-      print('')
-      pint(save(fileName))
-      
     
-    if inp == 'l': # Load
-      
-      fileName = input('File name: ')
-      
-      print('')
-      print(load(fileName))
-      
     
-    # Calculating Loop
+    # Render
     
-    while calculating:
-      
-      # Exit
-      
-      key = detectKey()
-      
-      if key == 'q':
-        break
-      
+    render()
     
   
 
+# Try: Wrapper
+
+try:
+  main()
 except Exception as e:
-  logging.exception(e)
+  
+  logging.exception('Fatal Error') # Log
+  
+  # Error message
   print('\033[97;41mFatal Error\033[0m')
+  
