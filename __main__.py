@@ -18,7 +18,7 @@ import time
 import random
 import json
 import fractions
-import decimals
+import decimal
 import logging
 
 logging.basicConfig(
@@ -36,16 +36,17 @@ configPath = 'config.json' # Path to config file
 
 # Control
 
-run = True # Run Main Loop
 spc = 1/4 # Second per Calculation
 tick = 0 # Time ticker
 calcTime = time.time() # Time calc started for spc
 
+start = time.time() # Start time
+
 # Calculation
 
 piFrac = fractions.Fraction() # Fraction for storing pi approximation
-piDec = decimals.Decimal('0') # Decimal representation of pi approximation
-piDecPrev = decimals.Decimal('0') # Old decimal representation of pi approximation
+piDec = decimal.Decimal('0') # Decimal representation of pi approximation
+piDecPrev = decimal.Decimal('0') # Old decimal representation of pi approximation
 
 method = '' # Method used for calculating pi
 
@@ -143,11 +144,17 @@ def render():
   
   screen = '' # What to print
   
-  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to quit [ctrl + C]' # Title
+  # Title
   
-  screen += hue(0)
+  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to quit [ctrl + C]\n'
   
-  screen += 'Time: ' + ticker + '\n' # Info
+  # Info
+  
+  screen += '\033[94mTick: ' + str(tick) + ' | '
+  screen += 'Time: ' + str(round(time.time() - start, 4)) + 's | '
+  screen += str(round(tick / (time.time() - start), 4)) + ' tps\033[0m\n'
+  
+  # Clear and Print
   
   os.system('clear') # Clear
   
@@ -158,9 +165,10 @@ def render():
 
 def main():
   
+  start = time.time() # Start time
+  
   # Global Variables
   
-  global run
   global spc
   global tick
   global calcTime
@@ -172,7 +180,7 @@ def main():
   
   # Main Loop
   
-  while run:
+  while True:
     
     # Clock
     
@@ -202,4 +210,9 @@ except Exception as e:
   
   # Error message
   print('\033[97;41mFatal Error\033[0m')
+  
+except KeyboardInterrupt: # Shutdown
+  
+  logging.info('Keyboard Interrupt') # Logging
+  print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
   
