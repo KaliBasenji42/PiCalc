@@ -36,11 +36,12 @@ configPath = 'config.json' # Path to config file
 
 # Control
 
-spc = 1/4 # Second per Calculation
+spt = 1/4 # Second per tick
 tick = 0 # Time ticker
-calcTime = time.time() # Time calc started for spc
+tickTime = time.time() # Time tick started for spt
 
 start = time.time() # Start time
+tickStart = time.time() # Start time for tick
 
 # Calculation
 
@@ -62,7 +63,7 @@ def readConfig(): # Read config file
   
   # Variables
   
-  global spc
+  global spt
   
   global method
   global stabilityThreshold
@@ -74,7 +75,7 @@ def readConfig(): # Read config file
   
   # Set variables
   
-  spc = 1 / data['cps']
+  spt = 1 / data['tps']
   
   method = data['method']
   stabilityThreshold = data['stabilityThreshold']
@@ -146,13 +147,13 @@ def render():
   
   # Title
   
-  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to quit [ctrl + C]\n'
+  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C]\n'
   
   # Info
   
   screen += '\033[94mTick: ' + str(tick) + ' | '
-  screen += 'Time: ' + str(round(time.time() - start, 4)) + 's | '
-  screen += str(round(tick / (time.time() - start), 4)) + ' tps\033[0m\n'
+  screen += '' + str(round(time.time() - start, 4)) + ' s | '
+  screen += str(round(1 / (time.time() - tickStart), 4)) + ' tps\033[0m\n'
   
   # Clear and Print
   
@@ -163,15 +164,21 @@ def render():
 
 ### Main Loop ###
 
+# Pre-Loop
+
+readConfig()
+
+# Main Definition
+
 def main():
-  
-  start = time.time() # Start time
   
   # Global Variables
   
-  global spc
+  global spt
   global tick
-  global calcTime
+  global tickTime
+  global start
+  global tickStart
   
   global piFrac
   global piDec
@@ -180,15 +187,17 @@ def main():
   
   # Main Loop
   
+  start = time.time() # Start time
+  
   while True:
     
     # Clock
     
     tick += 1 # Iterate time ticker
     
-    elapsed = time.time() - calcTime # Time since last frame
-    time.sleep(max(0, spc - elapsed)) # Pause
-    calcTime = time.time() # Update frame time
+    elapsed = time.time() - tickTime # Time since last frame
+    time.sleep(max(0, spt - elapsed)) # Pause
+    tickTime = time.time() # Update frame time
     
     # Calculate
     
@@ -198,9 +207,11 @@ def main():
     
     render()
     
+    tickStart = time.time() # Start time
+    
   
 
-# Try: Wrapper
+# Try Wrapper
 
 try:
   main()

@@ -1,0 +1,13 @@
+{
+  "Ticks (frames/calculations) per second cap": "comment",
+  "tps": 4,
+  
+  "Method used for calculating pi (or other value)": "comment",
+  "method": "",
+  
+  "How long a digit has to stay the same to be considered stable": "comment",
+  "stabilityThreshold": 8,
+  
+  "Digits calculated after last consecutive stable digit": "comment",
+  "digitBuffer": 16
+}
