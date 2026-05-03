@@ -1,6 +1,6 @@
 {
   "Ticks (frames/calculations) per second cap": "comment",
-  "tps": 4,
+  "tps": 16,
   
   "Method used for calculating pi (or other value)": "comment",
   "method": "Bailey–Borwein–Plouffe",

@@ -23,7 +23,7 @@ import decimal
 import logging
 
 logging.basicConfig(
-  level=logging.DEBUG,
+  level=logging.WARNING,
   format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
   filename='app.log'
 )
@@ -341,7 +341,7 @@ def main():
     tick += 1 # Iterate time ticker
     
     elapsed = time.time() - tickTime # Time since last frame
-    time.sleep(max(0, spt - elapsed)) # Pause
+    time.sleep(max(0.001, spt - elapsed)) # Pause
     tickTime = time.time() # Update frame time
     
     ### Calculate ###
@@ -383,15 +383,15 @@ def main():
 
 try:
   main()
+except KeyboardInterrupt: # Shutdown
+  
+  logging.info('Keyboard Interrupt') # Logging
+  print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
+  
 except Exception as e:
   
   logging.exception('Fatal Error') # Log
   
   # Error message
   print('\033[97;41mFatal Error\033[0m')
-  
-except KeyboardInterrupt: # Shutdown
-  
-  logging.info('Keyboard Interrupt') # Logging
-  print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
   
