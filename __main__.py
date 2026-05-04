@@ -144,6 +144,16 @@ def RandomCircle(n):
   ) # Set
   
 
+def EulersNumber(n):
+  
+  global piFrac
+  
+  piFrac += fractions.Fraction(
+    1,
+    math.factorial(n)
+  )
+  
+
 # Decimal / Digit
 
 def digitStr(string): # Returns string with only numeric values
@@ -381,6 +391,8 @@ def main():
       BaileyBorweinPlouffe(tick-1)
     elif(method == 'Random-Circle'):
       RandomCircle(tick)
+    elif(method == "Euler's-Number"):
+      EulersNumber(tick-1)
     
     # Decimal
     
@@ -402,6 +414,12 @@ def main():
     ### Render ###
     
     try: render()
+    except KeyboardInterrupt: # Exit
+      
+      logging.info('Keyboard Interrupt') # Logging
+      print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
+      quit()
+      
     except: logging.exception('Rendering Error')
     
     actualTps = 1 / (time.time() - tickStart) # Actual ticks per second

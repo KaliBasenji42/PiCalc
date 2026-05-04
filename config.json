@@ -7,7 +7,8 @@
   "Options (comment)": [
     "Gregory–Leibniz",
     "Bailey–Borwein–Plouffe",
-    "Random-Circle"
+    "Random-Circle",
+    "Euler's-Number"
   ],
   
   "How long a digit has to stay the same to be considered stable": "comment",
