@@ -300,14 +300,6 @@ def render():
   
   screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C]\n'
   
-  # Info
-  
-  screen += '\033[94mTick: ' + str(tick) + ' | '
-  screen += '' + str(round(time.time() - start, 4)) + ' s | '
-  screen += str(round(actualTps, 4)) + ' tps\033[0m\n'
-  
-  screen += '\033[95mStable Digits: ' + str(stableDigits) + '\033[0m\n'
-  
   # Pi
   
   piStr = '' # String for pi
@@ -341,6 +333,14 @@ def render():
     
   
   screen += piStr + '\n'
+  
+  # Info
+  
+  screen += '\033[94mTick: ' + str(tick) + ' | '
+  screen += '' + str(round(time.time() - start, 4)) + ' s | '
+  screen += str(round(actualTps, 4)) + ' tps\033[0m\n'
+  
+  screen += '\033[95mStable Digits: ' + str(stableDigits) + '\033[0m\n'
   
   # Clear and Print
   
