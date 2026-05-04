@@ -164,6 +164,58 @@ def AperyConstant(n):
   )
   
 
+def GoldenRatio(n):
+  
+  global piFrac
+  
+  if piFrac.numerator == 0:
+    piFrac = fractions.Fraction(1, 1)
+    return
+  
+  piFrac = 1 + fractions.Fraction(
+    piFrac.denominator,
+    piFrac.numerator
+  )
+  
+
+def GoldenRatioFibonacci(n):
+  
+  global piFrac
+  global piNumerator
+  global piDenominator
+  
+  fib = piNumerator + piDenominator
+  piDenominator = piNumerator
+  piNumerator = fib
+  
+  if piNumerator == 0: piNumerator = 1
+  if piDenominator == 0: piDenominator = 1
+  
+  piFrac = fractions.Fraction(
+    piNumerator,
+    piDenominator
+  )
+  
+
+def GoldenRatioLucas(n):
+  
+  global piFrac
+  global piNumerator
+  global piDenominator
+  
+  fib = piNumerator + piDenominator
+  piDenominator = piNumerator
+  piNumerator = fib
+  
+  if piNumerator == 0: piNumerator = 1
+  if piDenominator == 0: piDenominator = 2
+  
+  piFrac = fractions.Fraction(
+    piNumerator,
+    piDenominator
+  )
+  
+
 # Decimal / Digit
 
 def digitStr(string): # Returns string with only numeric values
@@ -393,7 +445,7 @@ def main():
     
     ### Calculate ###
     
-    # Fraction math
+    # Function Calls
     
     if(method == 'Gregory–Leibniz'):
       GregoryLeibniz(tick-1)
@@ -405,6 +457,12 @@ def main():
       EulersNumber(tick-1)
     elif(method == "Apéry's Constant"):
       AperyConstant(tick)
+    elif(method == 'Golden Ratio'):
+      GoldenRatio(tick)
+    elif(method == 'Golden Ratio-Fibonacci'):
+      GoldenRatioFibonacci(tick)
+    elif(method == 'Golden Ratio-Lucas'):
+      GoldenRatioLucas(tick)
     
     # Decimal
     
