@@ -60,6 +60,9 @@ digitBuffer = 16 # Digits calculated after last consecutive stable digit
 stableDigits = 0 # Number of consecutive stable digits
 digits = 16 # Number of digits to calculate to
 
+piNumerator = 0 # piFrac numerator for some calculations
+piDenominator = 0 # piFrac denominator for some calculations
+
 ### Functions ###
 
 # File
@@ -115,6 +118,30 @@ def BaileyBorweinPlouffe(n):
       fractions.Fraction(1, 8 * n + 6)
     )
   )
+  
+
+def RandomCircle(n):
+  
+  global piFrac
+  global piNumerator
+  global piDenominator
+  
+  x = random.random()
+  y = random.random()
+  
+  num = 0 # Numerator
+  
+  if math.sqrt(x ** 2 + y ** 2) <= 1: # Within circle
+    num = 4 # Numerator += 4
+  
+  
+  piNumerator += num # Add
+  piDenominator += 1 # Iterations
+  
+  piFrac = fractions.Fraction(
+    piNumerator,
+    piDenominator
+  ) # Set
   
 
 # Decimal / Digit
@@ -352,6 +379,8 @@ def main():
       GregoryLeibniz(tick-1)
     elif(method == 'Bailey–Borwein–Plouffe'):
       BaileyBorweinPlouffe(tick-1)
+    elif(method == 'Random-Circle'):
+      RandomCircle(tick)
     
     # Decimal
     
@@ -383,10 +412,11 @@ def main():
 
 try:
   main()
-except KeyboardInterrupt: # Shutdown
+except KeyboardInterrupt: # Exit
   
   logging.info('Keyboard Interrupt') # Logging
   print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
+  quit()
   
 except Exception as e:
   

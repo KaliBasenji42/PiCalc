@@ -6,7 +6,8 @@
   "method": "Bailey–Borwein–Plouffe",
   "Options (comment)": [
     "Gregory–Leibniz",
-    "Bailey–Borwein–Plouffe"
+    "Bailey–Borwein–Plouffe",
+    "Random-Circle"
   ],
   
   "How long a digit has to stay the same to be considered stable": "comment",
