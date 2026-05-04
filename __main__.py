@@ -154,6 +154,16 @@ def EulersNumber(n):
   )
   
 
+def AperyConstant(n):
+  
+  global piFrac
+  
+  piFrac += fractions.Fraction(
+    1,
+    n ** 3
+  )
+  
+
 # Decimal / Digit
 
 def digitStr(string): # Returns string with only numeric values
@@ -389,10 +399,12 @@ def main():
       GregoryLeibniz(tick-1)
     elif(method == 'Bailey–Borwein–Plouffe'):
       BaileyBorweinPlouffe(tick-1)
-    elif(method == 'Random-Circle'):
+    elif(method == 'Random Circle'):
       RandomCircle(tick)
-    elif(method == "Euler's-Number"):
+    elif(method == "Euler's Number"):
       EulersNumber(tick-1)
+    elif(method == "Apéry's Constant"):
+      AperyConstant(tick)
     
     # Decimal
     
