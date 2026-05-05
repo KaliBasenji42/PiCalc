@@ -447,9 +447,9 @@ def main():
     
     # Function Calls
     
-    if(method == 'Gregory–Leibniz'):
+    if(method == 'Gregory-Leibniz'):
       GregoryLeibniz(tick-1)
-    elif(method == 'Bailey–Borwein–Plouffe'):
+    elif(method == 'Bailey-Borwein-Plouffe'):
       BaileyBorweinPlouffe(tick-1)
     elif(method == 'Random Circle'):
       RandomCircle(tick)
