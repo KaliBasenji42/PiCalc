@@ -23,7 +23,7 @@ import decimal
 import logging
 
 logging.basicConfig(
-  level=logging.WARNING,
+  level=logging.DEBUG,
   format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
   filename='app.log'
 )
@@ -44,6 +44,18 @@ tickTime = time.time() # Time tick started for spt
 start = time.time() # Start time
 tickStart = time.time() # Start time for tick
 actualTps = 0 # Actual ticks per second for info
+
+justLoaded = False # Wether was just loaded
+
+# Other/Config
+
+headless = False # Wether to render
+
+saveLocation = 'save.txt' # Default save location
+saveOnExit = True # Wether to save on exit
+autoSaveFrequency = -1 # Auto save iteration frequency
+
+autoExit = -1 # How many iterations to execute before exit
 
 # Calculation
 
@@ -78,6 +90,12 @@ def readConfig(): # Read config file
   global digitBuffer
   global digits
   
+  global headless
+  global saveLocation
+  global saveOnExit
+  global autoSaveFrequency
+  global autoExit
+  
   # Read Files
   
   with open(configPath, 'r') as file: data = json.loads(file.read())
@@ -90,6 +108,56 @@ def readConfig(): # Read config file
   stabilityThreshold = data['stabilityThreshold']
   digitBuffer = data['digitBuffer']
   digits = data['digitBuffer'] # Initial value
+  
+  headless = data['headless']
+  saveLocation = data['saveLocation']
+  saveOnExit = data['saveOnExit']
+  autoSaveFrequency = data['autoSaveFrequency']
+  autoExit = data['autoExit']
+  
+  # Load
+  
+  if data['loadOnStartup']:
+    try: loadFile(saveLocation)
+    except Exception as e:
+      logging.exception('Could not Load File: ' + saveLocation)
+  
+
+def loadFile(path): # Load save file
+  
+  global piFrac
+  global piDec
+  global piDecPrev
+  global digitStabilities
+  global tick
+  global justLoaded
+  
+  logging.info('Loading from ' + path)
+  
+  with open(path, 'r') as file: data = json.loads(file.read()) # Read File
+  
+  piFrac = fractions.Fraction(data['numerator'], data['denominator'])
+  piDec = decimal.Decimal(data['decimal'])
+  digitStabilities = data['digitStabilities']
+  tick = data['tick']
+  
+  justLoaded = True
+  
+  
+
+def saveFile(path): # Save file
+  
+  logging.info('Saving to ' + path)
+  
+  data = {
+    'tick': tick,
+    'numerator': piFrac.numerator,
+    'denominator': piFrac.denominator,
+    'decimal': str(piDec),
+    'digitStabilities': digitStabilities
+  }
+  
+  with open(path, 'w') as file: file.write(json.dumps(data)) # Write File
   
 
 # Calculation
@@ -427,6 +495,8 @@ def main():
   global digits
   global stableDigits
   
+  global justLoaded
+  
   # Main Loop
   
   start = time.time() # Start time
@@ -471,8 +541,10 @@ def main():
     piDecPrev = piDec # Prev
     piDec = decimal.Decimal(piFrac.numerator) / decimal.Decimal(piFrac.denominator) # New
     
-    generateDigitStabilities(piDec, piDecPrev)
-    stableDigits = getStableDigits(digitStabilities)
+    if not justLoaded:
+      generateDigitStabilities(piDec, piDecPrev)
+      stableDigits = getStableDigits(digitStabilities)
+      justLoaded = False
     
     digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Re-calculate digit precision
     
@@ -483,12 +555,13 @@ def main():
     
     ### Render ###
     
-    try: render()
+    try:
+      if(not headless): render()
     except KeyboardInterrupt: # Exit
       
       logging.info('Keyboard Interrupt') # Logging
       print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
-      quit()
+      break
       
     except: logging.exception('Rendering Error')
     
@@ -504,7 +577,6 @@ except KeyboardInterrupt: # Exit
   
   logging.info('Keyboard Interrupt') # Logging
   print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
-  quit()
   
 except Exception as e:
   
@@ -513,3 +585,11 @@ except Exception as e:
   # Error message
   print('\033[97;41mFatal Error\033[0m')
   
+
+# Post Loop
+
+if saveOnExit:
+  try:
+    saveFile(saveLocation)
+  except Exception as e:
+    logging.exception('Could not Save File: ' + saveLocation)
