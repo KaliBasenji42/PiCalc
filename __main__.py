@@ -13,6 +13,7 @@
 
 ### Imports ###
 
+import sys
 import os
 import time
 import random
@@ -29,6 +30,8 @@ logging.basicConfig(
 )
 logging.debug('New Run')
 
+sys.set_int_max_str_digits(10**8)
+
 ### Variables ###
 
 # Files
@@ -44,8 +47,6 @@ tickTime = time.time() # Time tick started for spt
 start = time.time() # Start time
 tickStart = time.time() # Start time for tick
 actualTps = 0 # Actual ticks per second for info
-
-justLoaded = False # Wether was just loaded
 
 # Other/Config
 
@@ -126,23 +127,28 @@ def readConfig(): # Read config file
 def loadFile(path): # Load save file
   
   global piFrac
+  global piNumerator
+  global piDenominator
   global piDec
   global piDecPrev
   global digitStabilities
+  global stableDigits
+  global digits
   global tick
-  global justLoaded
   
   logging.info('Loading from ' + path)
   
   with open(path, 'r') as file: data = json.loads(file.read()) # Read File
   
   piFrac = fractions.Fraction(data['numerator'], data['denominator'])
+  piNumerator = data['calcNumerator']
+  piDenominator = data['calcDenominator']
   piDec = decimal.Decimal(data['decimal'])
   digitStabilities = data['digitStabilities']
+  stableDigits = data['stableDigits']
   tick = data['tick']
   
-  justLoaded = True
-  
+  digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Calculate digit precision
   
 
 def saveFile(path): # Save file
@@ -151,9 +157,12 @@ def saveFile(path): # Save file
   
   data = {
     'tick': tick,
+    'stableDigits': stableDigits,
+    'decimal': str(piDec),
     'numerator': piFrac.numerator,
     'denominator': piFrac.denominator,
-    'decimal': str(piDec),
+    'calcNumerator': piNumerator,
+    'calcDenominator': piDenominator,
     'digitStabilities': digitStabilities
   }
   
@@ -495,77 +504,90 @@ def main():
   global digits
   global stableDigits
   
-  global justLoaded
-  
   # Main Loop
   
   start = time.time() # Start time
   
-  while True:
-    
-    ### Clock ###
-    
-    tickStart = time.time() # Start of tick
-    
-    tick += 1 # Iterate time ticker
-    
-    elapsed = time.time() - tickTime # Time since last frame
-    time.sleep(max(0.001, spt - elapsed)) # Pause
-    tickTime = time.time() # Update frame time
-    
-    ### Calculate ###
-    
-    # Function Calls
-    
-    if(method == 'Gregory-Leibniz'):
-      GregoryLeibniz(tick-1)
-    elif(method == 'Bailey-Borwein-Plouffe'):
-      BaileyBorweinPlouffe(tick-1)
-    elif(method == 'Random Circle'):
-      RandomCircle(tick)
-    elif(method == "Euler's Number"):
-      EulersNumber(tick-1)
-    elif(method == "Apéry's Constant"):
-      AperyConstant(tick)
-    elif(method == 'Golden Ratio'):
-      GoldenRatio(tick)
-    elif(method == 'Golden Ratio-Fibonacci'):
-      GoldenRatioFibonacci(tick)
-    elif(method == 'Golden Ratio-Lucas'):
-      GoldenRatioLucas(tick)
-    
-    # Decimal
-    
-    decimal.getcontext().prec = digits # Set precision
-    
-    piDecPrev = piDec # Prev
-    piDec = decimal.Decimal(piFrac.numerator) / decimal.Decimal(piFrac.denominator) # New
-    
-    if not justLoaded:
+  run = True # Wether to run
+  
+  try:
+    while run:
+      
+      ### Clock ###
+      
+      tickStart = time.time() # Start of tick
+      
+      tick += 1 # Iterate time ticker
+      
+      elapsed = time.time() - tickTime # Time since last frame
+      time.sleep(max(0.001, spt - elapsed)) # Pause
+      tickTime = time.time() # Update frame time
+      
+      ### Calculate ###
+      
+      # Function Calls
+      
+      if(method == 'Gregory-Leibniz'):
+        GregoryLeibniz(tick-1)
+      elif(method == 'Bailey-Borwein-Plouffe'):
+        BaileyBorweinPlouffe(tick-1)
+      elif(method == 'Random Circle'):
+        RandomCircle(tick)
+      elif(method == "Euler's Number"):
+        EulersNumber(tick-1)
+      elif(method == "Apéry's Constant"):
+        AperyConstant(tick)
+      elif(method == 'Golden Ratio'):
+        GoldenRatio(tick)
+      elif(method == 'Golden Ratio-Fibonacci'):
+        GoldenRatioFibonacci(tick)
+      elif(method == 'Golden Ratio-Lucas'):
+        GoldenRatioLucas(tick)
+      
+      # Decimal
+      
+      decimal.getcontext().prec = digits # Set precision
+      
+      piDecPrev = piDec # Prev
+      piDec = decimal.Decimal(piFrac.numerator) / decimal.Decimal(piFrac.denominator) # New
+      
       generateDigitStabilities(piDec, piDecPrev)
       stableDigits = getStableDigits(digitStabilities)
-      justLoaded = False
-    
-    digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Re-calculate digit precision
-    
-    #logging.debug('Frac: ' + str(piFrac))
-    #logging.debug('Dec: ' + str(piDec))
-    #logging.debug('Stabilities: ' + str(digitStabilities))
-    #logging.debug('Digits: ' + str(digits))
-    
-    ### Render ###
-    
-    try:
-      if(not headless): render()
-    except KeyboardInterrupt: # Exit
       
-      logging.info('Keyboard Interrupt') # Logging
-      print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
-      break
+      digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Re-calculate digit precision
       
-    except: logging.exception('Rendering Error')
+      #logging.debug('Frac: ' + str(piFrac))
+      #logging.debug('Dec: ' + str(piDec))
+      #logging.debug('Stabilities: ' + str(digitStabilities))
+      #logging.debug('Digits: ' + str(digits))
+      
+      ### Render ###
+      
+      try:
+        if(not headless): render()
+      except KeyboardInterrupt: # Exit
+        
+        logging.info('Keyboard Interrupt') # Logging
+        print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
+        break
+        
+      except: logging.exception('Rendering Error')
+      
+      actualTps = 1 / (time.time() - tickStart) # Actual ticks per second
+      
+      ### Auto ###
+      
+      if autoSaveFrequency >= 0 and tick % autoSaveFrequency == 0:
+        saveFile(saveLocation)
+      
+      if autoExit >= 0 and tick == autoExit:
+        run = False
+      
+  except KeyboardInterrupt: # Keyboard Interrupt
     
-    actualTps = 1 / (time.time() - tickStart) # Actual ticks per second
+    run = False # Exit
+    logging.info('Keyboard Interrupt') # Logging
+    print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
     
   
 
@@ -573,11 +595,6 @@ def main():
 
 try:
   main()
-except KeyboardInterrupt: # Exit
-  
-  logging.info('Keyboard Interrupt') # Logging
-  print('\033[92m\nKeyboard Interrupt - Exiting\033[0m')
-  
 except Exception as e:
   
   logging.exception('Fatal Error') # Log
