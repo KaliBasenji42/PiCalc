@@ -580,7 +580,7 @@ def main():
       if autoSaveFrequency >= 0 and tick % autoSaveFrequency == 0:
         saveFile(saveLocation)
       
-      if autoExit >= 0 and tick == autoExit:
+      if autoExit >= 0 and tick >= autoExit:
         run = False
       
   except KeyboardInterrupt: # Keyboard Interrupt
