@@ -24,7 +24,7 @@ import decimal
 import logging
 
 logging.basicConfig(
-  level=logging.DEBUG,
+  level=logging.WARNING,
   format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
   filename='app.log'
 )
