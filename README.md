@@ -19,7 +19,7 @@ Equations from [wikipedia.com](https://wikipedia.com).
 ├── LICENSE.md <i>- GPL v2 License</i>
 ├── __main__.py <i>- Main script</i>
 ├── README.md <i>- This file</i>
-└── save.txt <i>- Default save file</i>
+└── save.json <i>- Default save file</i>
 </pre>
 
 # Methods
