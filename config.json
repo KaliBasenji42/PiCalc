@@ -28,13 +28,13 @@
   "saveLocation": "save.json",
   
   "Wether to save on exit": "comment",
-  "saveOnExit": true,
+  "saveOnExit": false,
   
   "How many iterations between each auto save (negative to disable)": "comment",
   "autoSaveFrequency": -1,
   
   "Wether to load from saveLocation on startup": "comment",
-  "loadOnStartup": true,
+  "loadOnStartup": false,
   
   "How many iteration to execute before exiting (negative to disable)": "comment",
   "autoExit": -1
