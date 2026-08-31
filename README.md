@@ -26,19 +26,19 @@ Equations from [wikipedia.com](https://wikipedia.com).
 
 **Gregory-Leibniz:**  
 
-Infinite sum that converges onto π.  
+Infinite sum that converges onto pi (π).  
 
-$\sum_{k=0}^∞ \dfrac{(-1)^k}{2k + 1}$  
+$π = \sum_{k=0}^∞ \dfrac{(-1)^k}{2k + 1}$  
 
 **Bailey-Borwein-Plouffe:**  
 
-Infinite sum that converges onto π.  
+Infinite sum that converges onto pi (π).  
 
-$\sum_{n=0}^∞ \left( \dfrac{1}{16^n} \left( \dfrac{4}{8n + 1} - \dfrac{2}{8n + 4} - \dfrac{1}{8n + 5} - \dfrac{1}{8n + 6} \right) \right)$  
+$π = \sum_{n=0}^∞ \left( \dfrac{1}{16^n} \left( \dfrac{4}{8n + 1} - \dfrac{2}{8n + 4} - \dfrac{1}{8n + 5} - \dfrac{1}{8n + 6} \right) \right)$  
 
 **Random Circle:**  
 
-Monte Carlo method that converges onto π by generating a random x and y value between 0 and 1, and calculating wether the point (x, y) falls within a circle of radius one centered on the origin. If the point does fall within the circle: 4 is added to the numerator. No matter the outcome 1 is always added to the denominator.  
+Monte Carlo method that converges onto pi by generating a random x and y value between 0 and 1, and calculating wether the point (x, y) falls within a circle of radius one centered on the origin. If the point does fall within the circle: 4 is added to the numerator. No matter the outcome 1 is always added to the denominator.  
 
 $x = \text{random.random()}$  
 $y = \text{random.random()}$  
@@ -48,7 +48,7 @@ $\text{denominator } += 1$
 
 **Euler's Number:**  
 
-Infinite sum that converges onto Euler's Number, $e$.  
+Infinite sum that converges onto Euler's Number ($e$).  
 
 $e = \sum_{n=0}^∞ \dfrac{1}{n!}$  
 
@@ -60,7 +60,7 @@ $ζ(3) = \sum_{n=1}^∞ \dfrac{1}{n^3}$
 
 **Golden Ratio:**  
 
-Infinite algorithm that converges onto the Golden Ratio, ρ:  
+Infinite algorithm that converges onto the Golden Ratio (ρ):  
 
 $ρ_{i+1} = 1 + \dfrac{1}{ρ_i}$  
 
@@ -68,7 +68,7 @@ Where $ρ_{i+1}$ is the next iteration of ρ.
 
 **Golden Ratio-Fibonacci:**  
 
-Fraction that converges onto the Golden Ratio, ρ, using the Fibonacci sequence.  
+Fraction that converges onto the Golden Ratio (ρ) using the Fibonacci sequence.  
 
 $ρ = \lim_{n \to ∞} \dfrac{F_{n+1}}{F_n}$  
 
@@ -78,7 +78,7 @@ The part of the Fibonacci sequence being used is $1, 1, 2, 3, 5 ... F_n$ (initia
 
 **Golden Ratio-Lucas:**  
 
-Fraction that converges onto the Golden Ratio, ρ, using the Lucas sequence.  
+Fraction that converges onto the Golden Ratio (ρ) using the Lucas sequence.  
 
 $ρ = \lim_{n \to ∞} \dfrac{L_{n+1}}{L_n}$  
 
@@ -86,3 +86,14 @@ Where $L_n$ is the $n\text{'th}$ number of the Lucas sequence.
 
 The Lucas sequence being $2, 1, 3, 4, 7 ... L_n$. Where $L_n = L_{n-2} + L_{n-1}$. This is calculated by initially setting the numerator to 1 and the denominator to 2. This is calculated the exact same way as the Fibonacci method above, but with initial values of $2, 1$ instead of $1, 1$.    
 
+**ln2:**  
+
+Infinite sum that converges onto the natural log of 2.  
+
+$\ln(2) = \sum_{n=1}^∞ \dfrac{(-1)^{n+1}}{n}$  
+
+**BBP ln2:**  
+
+Bailey-Borwein-Plouffe method for calculating natural log of 2.  
+
+$\ln(2) = \dfrac{2}{3} + \dfrac{1}{2} \sum_{n=1}^∞ \left( \dfrac{1}{16^n} \left( \dfrac{1}{2n} - \dfrac{1}{4n + 1} - \dfrac{1}{8n + 4} - \dfrac{1}{16n + 12} \right) \right)$  

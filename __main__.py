@@ -24,7 +24,7 @@ import decimal
 import logging
 
 logging.basicConfig(
-  level=logging.WARNING,
+  level=logging.DEBUG,
   format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
   filename='app.log'
 )
@@ -173,22 +173,20 @@ def saveFile(path): # Save file
 
 def GregoryLeibniz(n):
   
-  global piFrac
+  global piFrac # 0/1
   
-  piFrac += fractions.Fraction(
+  piFrac += fractions.Fraction( # Add fraction
     ((-1) ** n) * 4,
     2 * n + 1
   )
   
-  #logging.debug(piFrac)
-  
 
 def BaileyBorweinPlouffe(n):
   
-  global piFrac
+  global piFrac # 0/1
   
   piFrac += (
-    fractions.Fraction(1,16 ** n) * (
+    fractions.Fraction(1,16 ** n) * ( # Add fraction
       fractions.Fraction(4, 8 * n + 1) -
       fractions.Fraction(2, 8 * n + 4) -
       fractions.Fraction(1, 8 * n + 5) -
@@ -199,12 +197,12 @@ def BaileyBorweinPlouffe(n):
 
 def RandomCircle(n):
   
-  global piFrac
-  global piNumerator
-  global piDenominator
+  global piFrac # 0/1
+  global piNumerator # 0
+  global piDenominator # 0
   
-  x = random.random()
-  y = random.random()
+  x = random.random() # Random x
+  y = random.random() # Random y
   
   num = 0 # Numerator
   
@@ -215,17 +213,17 @@ def RandomCircle(n):
   piNumerator += num # Add
   piDenominator += 1 # Iterations
   
-  piFrac = fractions.Fraction(
+  piFrac = fractions.Fraction( # Set fraction
     piNumerator,
     piDenominator
-  ) # Set
+  )
   
 
 def EulersNumber(n):
   
-  global piFrac
+  global piFrac # 0/1
   
-  piFrac += fractions.Fraction(
+  piFrac += fractions.Fraction( # Add fraction
     1,
     math.factorial(n)
   )
@@ -233,9 +231,9 @@ def EulersNumber(n):
 
 def AperyConstant(n):
   
-  global piFrac
+  global piFrac # 0/1
   
-  piFrac += fractions.Fraction(
+  piFrac += fractions.Fraction( # Add fraction
     1,
     n ** 3
   )
@@ -243,13 +241,13 @@ def AperyConstant(n):
 
 def GoldenRatio(n):
   
-  global piFrac
+  global piFrac # 0/1
   
-  if piFrac.numerator == 0:
-    piFrac = fractions.Fraction(1, 1)
-    return
+  if piFrac.numerator == 0: # If 0...
+    piFrac = fractions.Fraction(1, 1) # Set to 1
+    return # Exit
   
-  piFrac = 1 + fractions.Fraction(
+  piFrac = 1 + fractions.Fraction( # 1 + reciprocal of previous
     piFrac.denominator,
     piFrac.numerator
   )
@@ -257,18 +255,18 @@ def GoldenRatio(n):
 
 def GoldenRatioFibonacci(n):
   
-  global piFrac
-  global piNumerator
-  global piDenominator
+  global piFrac # 0/1
+  global piNumerator # 0
+  global piDenominator # 0
   
-  fib = piNumerator + piDenominator
-  piDenominator = piNumerator
-  piNumerator = fib
+  fib = piNumerator + piDenominator # Find Fibonacci iteration
+  piDenominator = piNumerator # Denominator is previous Fibonacci
+  piNumerator = fib # Numerator is new Fibonacci
   
-  if piNumerator == 0: piNumerator = 1
-  if piDenominator == 0: piDenominator = 1
+  if piNumerator == 0: piNumerator = 1 # Start value
+  if piDenominator == 0: piDenominator = 1 # Start value
   
-  piFrac = fractions.Fraction(
+  piFrac = fractions.Fraction( # Set fraction
     piNumerator,
     piDenominator
   )
@@ -276,20 +274,49 @@ def GoldenRatioFibonacci(n):
 
 def GoldenRatioLucas(n):
   
-  global piFrac
-  global piNumerator
-  global piDenominator
+  global piFrac # 0/1
+  global piNumerator # 0
+  global piDenominator # 0
   
-  fib = piNumerator + piDenominator
-  piDenominator = piNumerator
-  piNumerator = fib
+  fib = piNumerator + piDenominator # Find Lucas iteration
+  piDenominator = piNumerator # Denominator is previous Lucas
+  piNumerator = fib # Numerator is new Lucas
   
-  if piNumerator == 0: piNumerator = 1
-  if piDenominator == 0: piDenominator = 2
+  if piNumerator == 0: piNumerator = 1 # Start value
+  if piDenominator == 0: piDenominator = 2 # Start value
   
-  piFrac = fractions.Fraction(
+  piFrac = fractions.Fraction( # Set fraction
     piNumerator,
     piDenominator
+  )
+  
+
+def ln2(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    (-1) ** (n + 1),
+    n
+  )
+  
+
+def BBPln2(n):
+  
+  global piFrac # 0/1
+  
+  if n == 0: # If start (prevent division by 0)
+    piFrac = fractions.Fraction(2, 3) # Set to 2/3
+    return # Exit
+  
+  piFrac += ( # Add fraction
+    fractions.Fraction(1,2) *
+    fractions.Fraction(1,16 ** n) * (
+      fractions.Fraction(1, 2 * n) +
+      fractions.Fraction(1, 4 * n + 1) +
+      fractions.Fraction(1, 8 * n + 4) +
+      fractions.Fraction(1, 16 * n + 12)
+    )
   )
   
 
@@ -354,7 +381,7 @@ def generateDigitStabilities(dec, decPrev):
   
   for i in range(len(decDigits)):
     
-    if(decDigits[i] == decDigitsPrev[i]): # Match 
+    if decDigits[i] == decDigitsPrev[i]: # Match 
       
       digitStabilities[i] = max(0, digitStabilities[i] - 1) # -1, min 0
       
@@ -427,7 +454,7 @@ def render():
   
   # Title
   
-  screen += '(C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C]\n'
+  screen += 'PiCalc (C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C] | ' + method + '\n'
   
   # Pi
   
@@ -527,22 +554,26 @@ def main():
       
       # Function Calls
       
-      if(method == 'Gregory-Leibniz'):
+      if method == 'Gregory-Leibniz':
         GregoryLeibniz(tick-1)
-      elif(method == 'Bailey-Borwein-Plouffe'):
+      elif method == 'Bailey-Borwein-Plouffe':
         BaileyBorweinPlouffe(tick-1)
-      elif(method == 'Random Circle'):
+      elif method == 'Random Circle':
         RandomCircle(tick)
-      elif(method == "Euler's Number"):
+      elif method == "Euler's Number":
         EulersNumber(tick-1)
-      elif(method == "Apéry's Constant"):
+      elif method == "Apéry's Constant":
         AperyConstant(tick)
-      elif(method == 'Golden Ratio'):
+      elif method == 'Golden Ratio':
         GoldenRatio(tick)
-      elif(method == 'Golden Ratio-Fibonacci'):
+      elif method == 'Golden Ratio-Fibonacci':
         GoldenRatioFibonacci(tick)
-      elif(method == 'Golden Ratio-Lucas'):
+      elif method == 'Golden Ratio-Lucas':
         GoldenRatioLucas(tick)
+      elif method == 'ln2':
+        ln2(tick)
+      elif method == 'BBP ln2':
+        BBPln2(tick-1)
       
       # Decimal
       
@@ -564,7 +595,7 @@ def main():
       ### Render ###
       
       try:
-        if(not headless): render()
+        if not headless: render()
       except KeyboardInterrupt: # Exit
         
         logging.info('Keyboard Interrupt') # Logging

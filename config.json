@@ -12,7 +12,9 @@
     "Apéry's Constant",
     "Golden Ratio",
     "Golden Ratio-Fibonacci",
-    "Golden Ratio-Lucas"
+    "Golden Ratio-Lucas",
+    "ln2",
+    "BBP ln2"
   ],
   
   "How long a digit has to stay the same to be considered stable": "comment",
