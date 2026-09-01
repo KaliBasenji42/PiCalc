@@ -24,7 +24,7 @@ import decimal
 import logging
 
 logging.basicConfig(
-  level=logging.DEBUG,
+  level=logging.WARNING,
   format='%(asctime)s | %(filename)s:%(lineno)s | %(levelname)s: %(message)s',
   filename='app.log'
 )
@@ -63,8 +63,11 @@ autoExit = -1 # How many iterations to execute before exit
 piFrac = fractions.Fraction(0, 1) # Fraction for storing pi approximation
 piDec = decimal.Decimal('0') # Decimal representation of pi approximation
 piDecPrev = decimal.Decimal('0') # Old decimal representation of pi approximation
+variables = [] # Global array for extra variables that are iterated in a function
+
 
 method = '' # Method used for calculating pi
+methodArguments = [] # Arguments to pass to method (if function)
 
 digitStabilities = [] # Array of how recently a digit changed 
 # 0 is most stable, starts at threshold and subtracts
@@ -87,6 +90,7 @@ def readConfig(): # Read config file
   global spt
   
   global method
+  global methodArguments
   global stabilityThreshold
   global digitBuffer
   global digits
@@ -106,6 +110,7 @@ def readConfig(): # Read config file
   spt = 1 / data['tps']
   
   method = data['method']
+  methodArguments = data['methodArguments']
   stabilityThreshold = data['stabilityThreshold']
   digitBuffer = data['digitBuffer']
   digits = data['digitBuffer'] # Initial value
@@ -229,13 +234,13 @@ def EulersNumber(n):
   )
   
 
-def AperyConstant(n):
+def ReciprocalEulers(n):
   
   global piFrac # 0/1
   
   piFrac += fractions.Fraction( # Add fraction
     1,
-    n ** 3
+    ((-1) ** n) * math.factorial(n)
   )
   
 
@@ -317,6 +322,144 @@ def BBPln2(n):
       fractions.Fraction(1, 8 * n + 4) +
       fractions.Fraction(1, 16 * n + 12)
     )
+  )
+  
+
+def root2(n):
+  
+  global piFrac # 0/1
+  
+  if n == -1: # If start (prevent multiplication by 0)
+    piFrac = fractions.Fraction(1, 1) # Set to 1
+    return # Exit
+  
+  piFrac = piFrac * fractions.Fraction( # Product fraction
+    (4 * n + 2) ** 2,
+    (4 * n + 1) * (4 * n + 3)
+  )
+  
+
+def root2TaylorEuler(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    math.factorial(2 * n + 1),
+    (2 ** (3 * n + 1)) * (math.factorial(n) ** 2)
+  )
+  
+
+def ErdosBorweinConstant(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    (2 ** n) - 1
+  )
+  
+
+def ErdosBorweinConstant2(n):
+  
+  global piFrac # 0/1
+  
+  if n == 0: # If start (+1)
+    piFrac = fractions.Fraction(1, 1) # Set to 1
+    return # Exit
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    (2 ** n) * ((2 ** n) - 1)
+  )
+  
+
+def LiouvilleConstant(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    10 ** math.factorial(n)
+  )
+  
+
+def CatalanConstant(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    - ((-4096) ** n) * (45136 * n ** 4 - 57184 * n ** 3 + 21240 * n ** 2 - 3160 * n + 165) * (math.factorial(2 * n) ** 6) * (math.factorial(3 * n) ** 3),
+    1024 * (n ** 3) * ((2 * n - 1) ** 3) * (math.factorial(n) ** 3) * (math.factorial(6 * n) ** 3)
+  )
+  
+
+def CahenConstant(n):
+  
+  global piFrac # 0/1
+  
+  if n == 0: # If start
+    variables.append(2) # Initiate Sylvester's sequence
+  
+  else: # Iterate Sylvester's sequence
+    variables[0] = variables[0] * (variables[0] - 1) + 1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    (-1) ** n,
+    variables[0] - 1
+  )
+  
+
+def FavardConstant(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    (2 * n + 1) ** 2
+  )
+  
+
+def ProuhetThueMorseConstant(n):
+  
+  global piFrac # 0/1
+  
+  t = bin(n).count('1') % 2 # Prouhet-Thue-Morse sequence
+  
+  piFrac += fractions.Fraction( # Add fraction
+    t,
+    2 ** (n + 1)
+  )
+  
+
+def PaperfoldingConstant(n):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    8 ** (2 ** n),
+    (2 ** (2 ** (n + 2))) - 1
+  )
+  
+
+# Calculation Functions
+
+def RiemannZeta(n, x):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    n ** x
+  )
+  
+
+def DirichletBeta(n, x):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    (-1) ** n,
+    (2 * n + 1) ** x
   )
   
 
@@ -454,7 +597,7 @@ def render():
   
   # Title
   
-  screen += 'PiCalc (C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C] | ' + method + '\n'
+  screen += 'PiCalc (C) 2026 KaliBasenji42 - GPL v2 | Keyboard Interrupt to Quit [Ctrl + C] | ' + method + ' ' + str(methodArguments) + '\n'
   
   # Pi
   
@@ -554,26 +697,55 @@ def main():
       
       # Function Calls
       
-      if method == 'Gregory-Leibniz':
+      if method == "Gregory-Leibniz":
         GregoryLeibniz(tick-1)
-      elif method == 'Bailey-Borwein-Plouffe':
+      elif method == "Bailey-Borwein-Plouffe":
         BaileyBorweinPlouffe(tick-1)
-      elif method == 'Random Circle':
+      elif method == "Random Circle":
         RandomCircle(tick)
       elif method == "Euler's Number":
         EulersNumber(tick-1)
-      elif method == "Apéry's Constant":
-        AperyConstant(tick)
-      elif method == 'Golden Ratio':
+      elif method == "Reciprocal Euler's Number":
+        ReciprocalEulers(tick-1)
+      elif method == "Golden Ratio":
         GoldenRatio(tick)
-      elif method == 'Golden Ratio-Fibonacci':
+      elif method == "Golden Ratio-Fibonacci":
         GoldenRatioFibonacci(tick)
-      elif method == 'Golden Ratio-Lucas':
+      elif method == "Golden Ratio-Lucas":
         GoldenRatioLucas(tick)
-      elif method == 'ln2':
+      elif method == "ln2":
         ln2(tick)
-      elif method == 'BBP ln2':
+      elif method == "ln2-BBP":
         BBPln2(tick-1)
+      elif method == "Root 2":
+        root2(tick-2)
+      elif method == "Root 2-Taylor-Euler":
+        root2TaylorEuler(tick-1)
+      elif method == "Erdős-Borwein Constant":
+        ErdosBorweinConstant(tick)
+      elif method == "Erdős-Borwein Constant 2":
+        ErdosBorweinConstant2(tick-1)
+      elif method == "Liouville's Constant":
+        LiouvilleConstant(tick)
+      elif method == "Catalan's Constant":
+        CatalanConstant(tick)
+      elif method == "Cahen's Constant":
+        CahenConstant(tick-1)
+      elif method == "Cahen's Constant 2":
+        CahenConstant2(tick-1)
+      elif method == "Favard Constant":
+        FavardConstant(tick-1)
+      elif method == "Brun's Constant":
+        BrunConstant(tick)
+      elif method == "Prouhet-Thue-Morse Constant":
+        ProuhetThueMorseConstant(tick-1)
+      elif method == "Paperfolding Constant":
+        PaperfoldingConstant(tick-1)
+      
+      elif method == 'Riemann Zeta' and len(methodArguments) > 0:
+        RiemannZeta(tick, methodArguments[0])
+      elif method == 'Dirichlet Beta' and len(methodArguments) > 0:
+        DirichletBeta(tick-1, methodArguments[0])
       
       # Decimal
       
