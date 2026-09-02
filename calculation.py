@@ -26,7 +26,7 @@ piDenominator = 0 # piFrac denominator for some calculations
 # Calculation
 # Note that n starts at 1
 
-def GregoryLeibniz(n, x=[]):
+def GregoryLeibniz(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -38,7 +38,7 @@ def GregoryLeibniz(n, x=[]):
   )
   
 
-def BaileyBorweinPlouffe(n, x=[]):
+def BaileyBorweinPlouffe(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -54,7 +54,7 @@ def BaileyBorweinPlouffe(n, x=[]):
   )
   
 
-def RandomCircle(n, x=[]):
+def RandomCircle(n, args=[]):
   
   global piFrac # 0/1
   global piNumerator # 0
@@ -78,7 +78,7 @@ def RandomCircle(n, x=[]):
   )
   
 
-def EulersNumber(n, x=[]):
+def EulersNumber(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -90,19 +90,7 @@ def EulersNumber(n, x=[]):
   )
   
 
-def ReciprocalEulersNumber(n, x=[]):
-  
-  n = n - 1 # Start at 0
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    ((-1) ** n) * math.factorial(n)
-  )
-  
-
-def GoldenRatio(n, x=[]):
+def GoldenRatio(n, args=[]):
   
   global piFrac # 0/1
   
@@ -116,7 +104,7 @@ def GoldenRatio(n, x=[]):
   )
   
 
-def GoldenRatioFibonacci(n, x=[]):
+def GoldenRatioFibonacci(n, args=[]):
   
   global piFrac # 0/1
   global piNumerator # 0
@@ -135,7 +123,7 @@ def GoldenRatioFibonacci(n, x=[]):
   )
   
 
-def GoldenRatioLucas(n, x=[]):
+def GoldenRatioLucas(n, args=[]):
   
   global piFrac # 0/1
   global piNumerator # 0
@@ -154,7 +142,7 @@ def GoldenRatioLucas(n, x=[]):
   )
   
 
-def ln2(n, x=[]):
+def ln2(n, args=[]):
   
   global piFrac # 0/1
   
@@ -164,7 +152,7 @@ def ln2(n, x=[]):
   )
   
 
-def ln2BBP(n, x=[]):
+def ln2BBP(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -185,7 +173,7 @@ def ln2BBP(n, x=[]):
   )
   
 
-def root2(n, x=[]):
+def root2(n, args=[]):
   
   n = n - 2 # Start at -1
   
@@ -201,7 +189,7 @@ def root2(n, x=[]):
   )
   
 
-def root2TaylorEuler(n, x=[]):
+def root2TaylorEuler(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -213,7 +201,7 @@ def root2TaylorEuler(n, x=[]):
   )
   
 
-def ErdosBorweinConstant(n, x=[]):
+def ErdosBorweinConstant(n, args=[]):
   
   global piFrac # 0/1
   
@@ -223,7 +211,7 @@ def ErdosBorweinConstant(n, x=[]):
   )
   
 
-def ErdosBorweinConstant2(n, x=[]):
+def ErdosBorweinConstant2(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -239,7 +227,7 @@ def ErdosBorweinConstant2(n, x=[]):
   )
   
 
-def LiouvillesConstant(n, x=[]):
+def LiouvillesConstant(n, args=[]):
   
   global piFrac # 0/1
   
@@ -249,7 +237,7 @@ def LiouvillesConstant(n, x=[]):
   )
   
 
-def CatalansConstant(n, x=[]):
+def CatalansConstant(n, args=[]):
   
   global piFrac # 0/1
   
@@ -259,7 +247,7 @@ def CatalansConstant(n, x=[]):
   )
   
 
-def CahensConstant(n, x=[]):
+def CahensConstant(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -278,7 +266,7 @@ def CahensConstant(n, x=[]):
   )
   
 
-def FavardConstant(n, x=[]):
+def FavardConstant(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -290,7 +278,7 @@ def FavardConstant(n, x=[]):
   )
   
 
-def ProuhetThueMorseConstant(n, x=[]):
+def ProuhetThueMorseConstant(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -304,7 +292,7 @@ def ProuhetThueMorseConstant(n, x=[]):
   )
   
 
-def PaperfoldingConstant(n, x=[]):
+def PaperfoldingConstant(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -316,20 +304,59 @@ def PaperfoldingConstant(n, x=[]):
   )
   
 
-# Calculation Functions
-# These take an x value
-
-def RiemannZeta(n, x=[0]):
+def ReciprocalPowers(n, args=[]):
   
   global piFrac # 0/1
   
   piFrac += fractions.Fraction( # Add fraction
     1,
-    n ** x[0]
+    n ** n
   )
   
 
-def DirichletBeta(n, x=[0]):
+def HarmonicNumber(n, args=[]):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    n
+  )
+  
+
+# Calculation Functions
+# These take an x value
+
+def RiemannZeta(n, args=[]):
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    n ** args[0]
+  )
+  
+
+def RiemannZetaFibonacci(n, args=[]):
+  
+  global piFrac # 0/1
+  global piNumerator # 0
+  global piDenominator # 0
+  
+  fib = piNumerator + piDenominator # Find Fibonacci iteration
+  piDenominator = piNumerator # Denominator is previous Fibonacci
+  piNumerator = fib # Numerator is new Fibonacci
+  
+  if piNumerator == 0: piNumerator = 1 # Start value
+  if piDenominator == 0: piDenominator = 1 # Start value
+  
+  piFrac += fractions.Fraction( # Add fraction
+    1,
+    piDenominator ** args[0]
+  )
+  
+
+def DirichletBeta(n, args=[]):
   
   n = n - 1 # Start at 0
   
@@ -337,6 +364,42 @@ def DirichletBeta(n, x=[0]):
   
   piFrac += fractions.Fraction( # Add fraction
     (-1) ** n,
-    (2 * n + 1) ** x[0]
+    (2 * n + 1) ** args[0]
+  )
+  
+
+def Exponential(n, args=[]):
+  
+  n = n - 1 # Start at 0
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    args[0] ** n,
+    math.factorial(n) * (args[1] ** n)
+  )
+  
+
+def Sine(n, args=[]):
+  
+  n = n - 1 # Start at 0
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    ((-1) ** n) * (args[0] ** (2 * n + 1)),
+    math.factorial(2 * n + 1) * (args[1] ** (2 * n + 1))
+  )
+  
+
+def Cosine(n, args=[]):
+  
+  n = n - 1 # Start at 0
+  
+  global piFrac # 0/1
+  
+  piFrac += fractions.Fraction( # Add fraction
+    ((-1) ** n) * (args[0] ** (2 * n)),
+    math.factorial(2 * n) * (args[1] ** (2 * n))
   )
   

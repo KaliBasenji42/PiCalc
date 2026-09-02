@@ -458,7 +458,8 @@ except Exception as e:
   logging.exception('Fatal Error') # Log
   
   # Error message
-  print('\033[97;41mFatal Error\033[0m')
+  print('\033[97;41mFatal Error\033[0m\n')
+  print(e)
   
 
 # Post Loop

@@ -2,10 +2,10 @@
   "Ticks (frames and calculations) per second target": "comment",
   "tps": 16,
   
-  "Method used for calculating pi (or other value), or function. Options listed in readme": "comment",
+  "Method used for calculating pi (or other value), or function. Options listed in README.md": "comment",
   "method": "BaileyBorweinPlouffe",
   
-  "Numbers passed to method (e.g. x value)": "comment",
+  "Numbers passed to method (e.g. x value). Required for some methods": "comment",
   "methodArguments": [],
   
   "How long a digit has to stay the same to be considered stable": "comment",

@@ -15,6 +15,7 @@ Equations from [wikipedia.com](https://en.wikipedia.org/wiki/List_of_mathematica
 <pre>
 .
 ├── app.log <i>- Log file</i>
+├── calculation.py <i>- Calculation Functions module</i>
 ├── config.json <i>- Config file</i>
 ├── LICENSE.md <i>- GPL v2 License</i>
 ├── __main__.py <i>- Main script</i>
@@ -24,11 +25,17 @@ Equations from [wikipedia.com](https://en.wikipedia.org/wiki/List_of_mathematica
 
 # Methods
 
+Each of the following are a valid methods for the config:  
+
+`"method": "{method}"`  
+
+If "module 'calculation' has no attribute '{method}'" is thrown, then the method's function is not defined (method is invalid).  
+
 ### GregoryLeibniz
 
 Infinite sum that converges onto pi, π.  
 
-$π = \sum_{k=0}^∞ \dfrac{(-1)^k}{2k + 1}$  
+$π = 4 \sum_{n=0}^∞ \dfrac{(-1)^n}{2n + 1}$  
 
 ### BaileyBorweinPlouffe
 
@@ -51,12 +58,6 @@ denominator $+= 1$
 Infinite sum that converges onto Euler's Number, $e$.  
 
 $e = \sum_{n=0}^∞ \dfrac{1}{n!}$  
-
-### ReciprocalEulersNumber
-
-Infinite sum that converges onto the Reciprocal of Euler's Number.  
-
-$\dfrac{1}{e} = \sum_{n=0}^∞ \dfrac{1}{(-1)^n n!}$  
 
 ### GoldenRatio
 
@@ -108,7 +109,7 @@ $\sqrt{2} = \prod_{n=0}^∞ \dfrac{(4n + 2)^2}{(4n + 1)(4n + 3)}$
 
 Infinite sum that converges onto the square root of 2, √2. Above method with a Taylor series then an Euler Transform applied. Converges quicker than above method.  
 
-$\sqrt{2} = \sum_{n=0}^∞ \dfrac{(2n + 1)!}{2^{3n + 1}(k!)^2}$  
+$\sqrt{2} = \sum_{n=0}^∞ \dfrac{(2n + 1)!}{2^{3n + 1}(n!)^2}$  
 
 ### ErdosBorweinConstant
 
@@ -136,9 +137,9 @@ $L = \sum_{n=1}^∞ \dfrac{1}{10^{n!}}$
 
 ### CatalansConstant
 
-> Slightly Laggy  
+> Slightly laggy  
 
-Infinite sum that converges onto Catalan's Constant, $G$. Based on Dirichlet Beta of 2, converges quicker.  
+Infinite sum that converges onto Catalan's Constant, $G$. Based on DirichletBeta of 2, converges quicker.  
 
 $G = β(2) = -\dfrac{1}{1024} \sum_{n=1}^∞ \dfrac{(-4096)^n (45136n^4 - 57184n^3 + 21240n^2 - 3160n + 165) (2n)!^6 (3n)!^3}{n^3 (2n - 1)^3 n!^3 (6n)!^3}$  
 
@@ -181,23 +182,76 @@ Infinite sum that converges onto the Paperfolding Constant, $P$.
 
 $P = \sum_{n=0}^∞ \dfrac{8^{2^n}}{2^{2^{n+2}}-1}$  
 
+### ReciprocalPowers
+
+> Laggy  
+
+Infinite sum of the reciprocal of $n^n$.  
+
+$\sum_{n=1}^∞ \dfrac{1}{n^n} = \int_0^1 \dfrac{1}{x^x} dx$  
+
+### HarmonicNumber
+
+Infinite sum that converges onto the last harmonic number, $H_∞$.  
+
+$H_∞ = \sum_{n=1}^∞ \dfrac{1}{n}$  
+
 ## Functions
 
-These methods take `methodArguments` (below `method` in config).  
+These methods take `methodArguments` (below `method` in config):  
+
+`"methodArguments": [{a}, {b}, ...]`  
+
+If a "list index out of range" error is thrown, then not enough `methodArguments` were listed. If "both arguments should be Rational instances" is thrown, then you probably need to rewrite each argument as a whole number.  
 
 ### RiemannZeta
 
-Infinite sum that converges onto the Riemann Zeta function given 1 argument $x$, $ζ(x)$.  
+Infinite sum that converges onto the Riemann Zeta function of 1 argument $x$, $ζ(x)$.  
 
 $ζ(x) = \sum_{n=1}^∞ \dfrac{1}{n^x}$  
 
 If $x = 2$, it calculates Basel's Number.  
 If $x = 3$, it calculates Apéry's Constant.  
 
+### RiemannZetaFibonacci
+
+> Slightly Laggy  
+
+Infinite sum that converges onto the Riemann Zeta function of 1 argument $x$, $ζ_F(x)$, using the Fibonacci sequence.  
+
+$ζ_F(x) = \sum_{n=0}^∞ \dfrac{1}{(F_n)^x}$  
+
+Where $F_n$ is the $n\text{'th}$ number of the Fibonacci sequence.  
+
+The part of the Fibonacci sequence being used is $1, 1, 2, 3, 5 ... F_n$ (initial 0 skipped). Where $F_n = F_{n-2} + F_{n-1}$. This is calculated the same way in GoldenRatioFibonacci.  
+
+If $x = 1$, it calculates Reciprocal Fibonacci Constant, $ψ$.  
+
 ### DirichletBeta
 
-Infinite sum that converges onto the Dirichlet Beta function given 1 argument $x$, $β(x)$.  
+Infinite sum that converges onto the Dirichlet Beta function of 1 argument $x$, $β(x)$.  
 
 $β(x) = \sum_{n=0}^∞ \dfrac{(-1)^n}{(2n+1)^x}$  
 
 If $x = 2$, it calculates Catalan's Constant, $G$.  
+
+### Exponential
+
+Maclaurin Series (infinite sum) that converges onto the Exponential function of the fraction of 2 arguments $a$ and $b$, $e^{\dfrac{a}{b}}$.  
+
+$e^{\dfrac{a}{b}} = \sum_{n=0}^∞ \dfrac{a^n}{b^n n!}$  
+
+If $\dfrac{a}{b} = 1$, it calculates Euler's Number, $e$.  
+If $\dfrac{a}{b} = -1$, it calculates the reciprocal of Euler's Number, $\dfrac{1}{e}$.  
+
+### Sine
+
+Maclaurin Series (infinite sum) that converges onto the Sine of the fraction of 2 arguments $a$ and $b$, $\sin(\dfrac{a}{b})$.  
+
+$\sin(\dfrac{a}{b}) = \sum_{n=0}^∞ \dfrac{(-1)^n a^{2n + 1}}{(2n + 1)! b^{2n + 1}}$  
+
+### Cosine
+
+Maclaurin Series (infinite sum) that converges onto the Cosine of the fraction of 2 arguments $a$ and $b$, $\cos(\dfrac{a}{b})$.  
+
+$\cos(\dfrac{a}{b}) = \sum_{n=0}^∞ \dfrac{(-1)^n a^{2n}}{(2n)! b^{2n}}$  
