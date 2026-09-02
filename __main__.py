@@ -32,6 +32,8 @@ logging.debug('New Run')
 
 sys.set_int_max_str_digits(10**8)
 
+import calculation as calc # Calculation functions
+
 ### Variables ###
 
 # Files
@@ -60,11 +62,8 @@ autoExit = -1 # How many iterations to execute before exit
 
 # Calculation
 
-piFrac = fractions.Fraction(0, 1) # Fraction for storing pi approximation
 piDec = decimal.Decimal('0') # Decimal representation of pi approximation
 piDecPrev = decimal.Decimal('0') # Old decimal representation of pi approximation
-variables = [] # Global array for extra variables that are iterated in a function
-
 
 method = '' # Method used for calculating pi
 methodArguments = [] # Arguments to pass to method (if function)
@@ -75,9 +74,6 @@ stabilityThreshold = 8 # How long a digit has to stay the same to be considered 
 digitBuffer = 16 # Digits calculated after last consecutive stable digit
 stableDigits = 0 # Number of consecutive stable digits
 digits = 16 # Number of digits to calculate to
-
-piNumerator = 0 # piFrac numerator for some calculations
-piDenominator = 0 # piFrac denominator for some calculations
 
 ### Functions ###
 
@@ -131,9 +127,6 @@ def readConfig(): # Read config file
 
 def loadFile(path): # Load save file
   
-  global piFrac
-  global piNumerator
-  global piDenominator
   global piDec
   global piDecPrev
   global digitStabilities
@@ -145,9 +138,9 @@ def loadFile(path): # Load save file
   
   with open(path, 'r') as file: data = json.loads(file.read()) # Read File
   
-  piFrac = fractions.Fraction(data['numerator'], data['denominator'])
-  piNumerator = data['calcNumerator']
-  piDenominator = data['calcDenominator']
+  calc.piFrac = fractions.Fraction(data['numerator'], data['denominator'])
+  calc.piNumerator = data['calcNumerator']
+  calc.piDenominator = data['calcDenominator']
   piDec = decimal.Decimal(data['decimal'])
   digitStabilities = data['digitStabilities']
   stableDigits = data['stableDigits']
@@ -164,303 +157,14 @@ def saveFile(path): # Save file
     'tick': tick,
     'stableDigits': stableDigits,
     'decimal': str(piDec),
-    'numerator': piFrac.numerator,
-    'denominator': piFrac.denominator,
-    'calcNumerator': piNumerator,
-    'calcDenominator': piDenominator,
+    'numerator': calc.piFrac.numerator,
+    'denominator': calc.piFrac.denominator,
+    'calcNumerator': calc.piNumerator,
+    'calcDenominator': calc.piDenominator,
     'digitStabilities': digitStabilities
   }
   
   with open(path, 'w') as file: file.write(json.dumps(data)) # Write File
-  
-
-# Calculation
-
-def GregoryLeibniz(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    ((-1) ** n) * 4,
-    2 * n + 1
-  )
-  
-
-def BaileyBorweinPlouffe(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += (
-    fractions.Fraction(1,16 ** n) * ( # Add fraction
-      fractions.Fraction(4, 8 * n + 1) -
-      fractions.Fraction(2, 8 * n + 4) -
-      fractions.Fraction(1, 8 * n + 5) -
-      fractions.Fraction(1, 8 * n + 6)
-    )
-  )
-  
-
-def RandomCircle(n):
-  
-  global piFrac # 0/1
-  global piNumerator # 0
-  global piDenominator # 0
-  
-  x = random.random() # Random x
-  y = random.random() # Random y
-  
-  num = 0 # Numerator
-  
-  if math.sqrt(x ** 2 + y ** 2) <= 1: # Within circle
-    num = 4 # Numerator += 4
-  
-  
-  piNumerator += num # Add
-  piDenominator += 1 # Iterations
-  
-  piFrac = fractions.Fraction( # Set fraction
-    piNumerator,
-    piDenominator
-  )
-  
-
-def EulersNumber(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    math.factorial(n)
-  )
-  
-
-def ReciprocalEulers(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    ((-1) ** n) * math.factorial(n)
-  )
-  
-
-def GoldenRatio(n):
-  
-  global piFrac # 0/1
-  
-  if piFrac.numerator == 0: # If 0...
-    piFrac = fractions.Fraction(1, 1) # Set to 1
-    return # Exit
-  
-  piFrac = 1 + fractions.Fraction( # 1 + reciprocal of previous
-    piFrac.denominator,
-    piFrac.numerator
-  )
-  
-
-def GoldenRatioFibonacci(n):
-  
-  global piFrac # 0/1
-  global piNumerator # 0
-  global piDenominator # 0
-  
-  fib = piNumerator + piDenominator # Find Fibonacci iteration
-  piDenominator = piNumerator # Denominator is previous Fibonacci
-  piNumerator = fib # Numerator is new Fibonacci
-  
-  if piNumerator == 0: piNumerator = 1 # Start value
-  if piDenominator == 0: piDenominator = 1 # Start value
-  
-  piFrac = fractions.Fraction( # Set fraction
-    piNumerator,
-    piDenominator
-  )
-  
-
-def GoldenRatioLucas(n):
-  
-  global piFrac # 0/1
-  global piNumerator # 0
-  global piDenominator # 0
-  
-  fib = piNumerator + piDenominator # Find Lucas iteration
-  piDenominator = piNumerator # Denominator is previous Lucas
-  piNumerator = fib # Numerator is new Lucas
-  
-  if piNumerator == 0: piNumerator = 1 # Start value
-  if piDenominator == 0: piDenominator = 2 # Start value
-  
-  piFrac = fractions.Fraction( # Set fraction
-    piNumerator,
-    piDenominator
-  )
-  
-
-def ln2(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    (-1) ** (n + 1),
-    n
-  )
-  
-
-def BBPln2(n):
-  
-  global piFrac # 0/1
-  
-  if n == 0: # If start (prevent division by 0)
-    piFrac = fractions.Fraction(2, 3) # Set to 2/3
-    return # Exit
-  
-  piFrac += ( # Add fraction
-    fractions.Fraction(1,2) *
-    fractions.Fraction(1,16 ** n) * (
-      fractions.Fraction(1, 2 * n) +
-      fractions.Fraction(1, 4 * n + 1) +
-      fractions.Fraction(1, 8 * n + 4) +
-      fractions.Fraction(1, 16 * n + 12)
-    )
-  )
-  
-
-def root2(n):
-  
-  global piFrac # 0/1
-  
-  if n == -1: # If start (prevent multiplication by 0)
-    piFrac = fractions.Fraction(1, 1) # Set to 1
-    return # Exit
-  
-  piFrac = piFrac * fractions.Fraction( # Product fraction
-    (4 * n + 2) ** 2,
-    (4 * n + 1) * (4 * n + 3)
-  )
-  
-
-def root2TaylorEuler(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    math.factorial(2 * n + 1),
-    (2 ** (3 * n + 1)) * (math.factorial(n) ** 2)
-  )
-  
-
-def ErdosBorweinConstant(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    (2 ** n) - 1
-  )
-  
-
-def ErdosBorweinConstant2(n):
-  
-  global piFrac # 0/1
-  
-  if n == 0: # If start (+1)
-    piFrac = fractions.Fraction(1, 1) # Set to 1
-    return # Exit
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    (2 ** n) * ((2 ** n) - 1)
-  )
-  
-
-def LiouvilleConstant(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    10 ** math.factorial(n)
-  )
-  
-
-def CatalanConstant(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    - ((-4096) ** n) * (45136 * n ** 4 - 57184 * n ** 3 + 21240 * n ** 2 - 3160 * n + 165) * (math.factorial(2 * n) ** 6) * (math.factorial(3 * n) ** 3),
-    1024 * (n ** 3) * ((2 * n - 1) ** 3) * (math.factorial(n) ** 3) * (math.factorial(6 * n) ** 3)
-  )
-  
-
-def CahenConstant(n):
-  
-  global piFrac # 0/1
-  
-  if n == 0: # If start
-    variables.append(2) # Initiate Sylvester's sequence
-  
-  else: # Iterate Sylvester's sequence
-    variables[0] = variables[0] * (variables[0] - 1) + 1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    (-1) ** n,
-    variables[0] - 1
-  )
-  
-
-def FavardConstant(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    (2 * n + 1) ** 2
-  )
-  
-
-def ProuhetThueMorseConstant(n):
-  
-  global piFrac # 0/1
-  
-  t = bin(n).count('1') % 2 # Prouhet-Thue-Morse sequence
-  
-  piFrac += fractions.Fraction( # Add fraction
-    t,
-    2 ** (n + 1)
-  )
-  
-
-def PaperfoldingConstant(n):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    8 ** (2 ** n),
-    (2 ** (2 ** (n + 2))) - 1
-  )
-  
-
-# Calculation Functions
-
-def RiemannZeta(n, x):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    1,
-    n ** x
-  )
-  
-
-def DirichletBeta(n, x):
-  
-  global piFrac # 0/1
-  
-  piFrac += fractions.Fraction( # Add fraction
-    (-1) ** n,
-    (2 * n + 1) ** x
-  )
   
 
 # Decimal / Digit
@@ -667,7 +371,6 @@ def main():
   global tickStart
   global actualTps
   
-  global piFrac
   global piDec
   global piDecPrev
   global digitStabilities
@@ -697,69 +400,21 @@ def main():
       
       # Function Calls
       
-      if method == "Gregory-Leibniz":
-        GregoryLeibniz(tick-1)
-      elif method == "Bailey-Borwein-Plouffe":
-        BaileyBorweinPlouffe(tick-1)
-      elif method == "Random Circle":
-        RandomCircle(tick)
-      elif method == "Euler's Number":
-        EulersNumber(tick-1)
-      elif method == "Reciprocal Euler's Number":
-        ReciprocalEulers(tick-1)
-      elif method == "Golden Ratio":
-        GoldenRatio(tick)
-      elif method == "Golden Ratio-Fibonacci":
-        GoldenRatioFibonacci(tick)
-      elif method == "Golden Ratio-Lucas":
-        GoldenRatioLucas(tick)
-      elif method == "ln2":
-        ln2(tick)
-      elif method == "ln2-BBP":
-        BBPln2(tick-1)
-      elif method == "Root 2":
-        root2(tick-2)
-      elif method == "Root 2-Taylor-Euler":
-        root2TaylorEuler(tick-1)
-      elif method == "Erdős-Borwein Constant":
-        ErdosBorweinConstant(tick)
-      elif method == "Erdős-Borwein Constant 2":
-        ErdosBorweinConstant2(tick-1)
-      elif method == "Liouville's Constant":
-        LiouvilleConstant(tick)
-      elif method == "Catalan's Constant":
-        CatalanConstant(tick)
-      elif method == "Cahen's Constant":
-        CahenConstant(tick-1)
-      elif method == "Cahen's Constant 2":
-        CahenConstant2(tick-1)
-      elif method == "Favard Constant":
-        FavardConstant(tick-1)
-      elif method == "Brun's Constant":
-        BrunConstant(tick)
-      elif method == "Prouhet-Thue-Morse Constant":
-        ProuhetThueMorseConstant(tick-1)
-      elif method == "Paperfolding Constant":
-        PaperfoldingConstant(tick-1)
-      
-      elif method == 'Riemann Zeta' and len(methodArguments) > 0:
-        RiemannZeta(tick, methodArguments[0])
-      elif method == 'Dirichlet Beta' and len(methodArguments) > 0:
-        DirichletBeta(tick-1, methodArguments[0])
+      getattr(calc, method)(tick, methodArguments)
       
       # Decimal
       
       decimal.getcontext().prec = digits # Set precision
       
       piDecPrev = piDec # Prev
-      piDec = decimal.Decimal(piFrac.numerator) / decimal.Decimal(piFrac.denominator) # New
+      piDec = decimal.Decimal(calc.piFrac.numerator) / decimal.Decimal(calc.piFrac.denominator) # New
       
       generateDigitStabilities(piDec, piDecPrev)
       stableDigits = getStableDigits(digitStabilities)
       
       digits = stableDigits - getWholeDigits(str(piDec)) + digitBuffer # Re-calculate digit precision
       
-      #logging.debug('Frac: ' + str(piFrac))
+      #logging.debug('Frac: ' + str(calc.piFrac))
       #logging.debug('Dec: ' + str(piDec))
       #logging.debug('Stabilities: ' + str(digitStabilities))
       #logging.debug('Digits: ' + str(digits))
